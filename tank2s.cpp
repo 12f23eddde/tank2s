@@ -1,3 +1,4 @@
+
 #include <stack>
 #include <set>
 #include <string>
@@ -14,15 +15,15 @@ const int none = 0, brick = 1, forest = 2, steel = 4, water = 8, tank = 16;
 const bool DebugMode = 0;
 int state[9][9];
 int myside;
-int rounds;//å›åˆæ•°
-int px[4] = { 0,1,0,-1 };//ä¸Šã€å³ã€ä¸‹ã€å·¦ï¼Œå¯¹åº”è¡ŒåŠ¨çš„0 1 2 3(è¡Œè¿›) å’Œ 4 5 6 7(å°„å‡»)
+int rounds;//»ØºÏÊı
+int px[4] = { 0,1,0,-1 };//ÉÏ¡¢ÓÒ¡¢ÏÂ¡¢×ó£¬¶ÔÓ¦ĞĞ¶¯µÄ0 1 2 3(ĞĞ½ø) ºÍ 4 5 6 7(Éä»÷)
 int py[4] = { -1,0,1,0 };
-/*å…¨å±€å˜é‡å®šä¹‰ç»“æŸ*/
+/*È«¾Ö±äÁ¿¶¨Òå½áÊø*/
 #define not_DEBUG
 struct point {
 	int x, y;
 	double cost;
-	friend bool operator <(point a, point b)//ä¸è¦åœ¨æ„è¿™ä¸ªå¥‡å¦™çš„æ¯”è¾ƒ
+	friend bool operator <(point a, point b)//²»ÒªÔÚÒâÕâ¸öÆæÃîµÄ±È½Ï
 	{
 		return a.cost > b.cost;
 	}
@@ -33,19 +34,19 @@ bool comp_point(point a, point b)
 	return a.cost < b.cost;
 }
 
-struct Distances//æœç´¢ä»¥åä¸Šä¸‹å·¦å³å››ä¸ªæ–¹å‘æœ€çŸ­æ—¶é—´
+struct Distances//ËÑË÷ÒÔºóÉÏÏÂ×óÓÒËÄ¸ö·½Ïò×î¶ÌÊ±¼ä
 {
 	double d[4];
 };
 
 class Tank {
 public:
-	int x, y;//ä½ç½®x y
-	bool in_bush = 0;//åœ¨æ ‘ä¸›ä¸­
-	int shoot_cnt = 1;//æ˜¯å¦å¯ä»¥å‘å°„ç‚®å¼¹,ä»¥åŠè¿ç»­å‡ ä¸ªå›åˆæ²¡æœ‰å‘å°„
+	int x, y;//Î»ÖÃx y
+	bool in_bush = 0;//ÔÚÊ÷´ÔÖĞ
+	int shoot_cnt = 1;//ÊÇ·ñ¿ÉÒÔ·¢ÉäÅÚµ¯,ÒÔ¼°Á¬Ğø¼¸¸ö»ØºÏÃ»ÓĞ·¢Éä
 	int dead = 0;//awsl
-	bool possible[9][9];//å¯èƒ½å¤„äºçš„ä½ç½®ï¼Œä»…å½“æ•Œæ–¹å­˜åœ¨äºæ ‘æ—ä¸­æ—¶æœ‰æ•ˆ
-	void cal_pos()//å½“in_bushä¸º1æ—¶ï¼Œè®¡ç®—å¯èƒ½ä½ç½®ï¼Œä¸º0æ—¶æ¸…ç©ºpossibleæ•°ç»„
+	bool possible[9][9];//¿ÉÄÜ´¦ÓÚµÄÎ»ÖÃ£¬½öµ±µĞ·½´æÔÚÓÚÊ÷ÁÖÖĞÊ±ÓĞĞ§
+	void cal_pos()//µ±in_bushÎª1Ê±£¬¼ÆËã¿ÉÄÜÎ»ÖÃ£¬Îª0Ê±Çå¿ÕpossibleÊı×é
 	{
 		if (in_bush == 0)
 		{
@@ -79,7 +80,7 @@ public:
 Tank  self_tank[2];
 Tank enemy_tank[2];
 
-bool in_map(int x,int y)//æ˜¯å¦åœ¨åœ°å›¾å†…
+bool in_map(int x,int y)//ÊÇ·ñÔÚµØÍ¼ÄÚ
 {
 	if (x >= 0 and x <= 8 and y >= 0 and y <= 8) return true;
 	else return false;
@@ -90,16 +91,16 @@ bool ok(int x, int y)// can a tank steps in?
 	return x >= 0 && x <= 8 && y >= 0 && y <= 8 && (~state[y][x] & steel) && (~state[y][x] & water) && (~state[y][x] & brick) && (~state[y][x] & tank);
 }
 
-bool in_range(int self_id, int enemy_id)//è‡ªå·±å’Œæ•Œæ–¹ä¸¤è¾†å¦å…‹æ˜¯å¦é¢å¯¹é¢
+bool in_range(int self_id, int enemy_id)//×Ô¼ººÍµĞ·½Á½Á¾Ì¹¿ËÊÇ·ñÃæ¶ÔÃæ
 {
-	if (self_tank[self_id].x != enemy_tank[enemy_id].x and self_tank[self_id].y != enemy_tank[enemy_id].y)//ä¸åœ¨åŒä¸€ç›´çº¿ä¸Š
+	if (self_tank[self_id].x != enemy_tank[enemy_id].x and self_tank[self_id].y != enemy_tank[enemy_id].y)//²»ÔÚÍ¬Ò»Ö±ÏßÉÏ
 		return false;
 
 	if (self_tank[self_id].x == enemy_tank[enemy_id].x)
 	{
 		int x = self_tank[self_id].x;
 		int y1 = self_tank[self_id].y, y2 = enemy_tank[enemy_id].y;
-		if (y1 == y2) return false;//åœ¨åŒä¸€ä¸ªæ ¼å­ä¸Šåº”è¯¥ä¸ç®—é™·å…¥æ±Ÿå±€
+		if (y1 == y2) return false;//ÔÚÍ¬Ò»¸ö¸ñ×ÓÉÏÓ¦¸Ã²»ËãÏİÈë½­¾Ö
 		if (y1 > y2)
 		{
 			int temp; temp = y1, y1 = y2, y2 = temp;
@@ -111,7 +112,7 @@ bool in_range(int self_id, int enemy_id)//è‡ªå·±å’Œæ•Œæ–¹ä¸¤è¾†å¦å…‹æ˜¯å¦é¢å¯
 			{
 				continue;
 			}
-			else//ä¸­é—´æœ‰é®æŒ¡åˆ™ä¸ç®—å¯¹é¢
+			else//ÖĞ¼äÓĞÕÚµ²Ôò²»Ëã¶ÔÃæ
 				return false;
 		}
 		return true;
@@ -119,7 +120,7 @@ bool in_range(int self_id, int enemy_id)//è‡ªå·±å’Œæ•Œæ–¹ä¸¤è¾†å¦å…‹æ˜¯å¦é¢å¯
 
 	else if (self_tank[self_id].y == enemy_tank[enemy_id].y)
 	{
-		//å¤§è§„æ¨¡ä»£ç å¤ç”¨
+		//´ó¹æÄ£´úÂë¸´ÓÃ
 		int y = self_tank[self_id].y;
 		int x1 = self_tank[self_id].x, x2 = enemy_tank[enemy_id].x;
 		if (x1 == x2) return false;
@@ -141,13 +142,13 @@ bool in_range(int self_id, int enemy_id)//è‡ªå·±å’Œæ•Œæ–¹ä¸¤è¾†å¦å…‹æ˜¯å¦é¢å¯
 	}
 }
 
-bool in_range(int enemy_id)//é‡è½½åçš„å‡½æ•°ï¼Œåˆ¤æ–­åŸºåœ°æ˜¯å¦ä¼šè¢«æ‰“ä¸­ï¼Œä¸ç®¡è¿™æ—¶æ•Œäººæœ‰æ²¡æœ‰ç‚®å¼¹éƒ½å¾ˆå±é™©
+bool in_range(int enemy_id)//ÖØÔØºóµÄº¯Êı£¬ÅĞ¶Ï»ùµØÊÇ·ñ»á±»´òÖĞ£¬²»¹ÜÕâÊ±µĞÈËÓĞÃ»ÓĞÅÚµ¯¶¼ºÜÎ£ÏÕ
 {
-	//å†æ¬¡å¤§è§„æ¨¡å¤ç”¨ï¼Œå’Œä¸Šä¸€ä¸ªå‡ ä¹ä¸€æ ·
+	//ÔÙ´Î´ó¹æÄ£¸´ÓÃ£¬ºÍÉÏÒ»¸ö¼¸ºõÒ»Ñù
 	if (4 != enemy_tank[enemy_id].x and myside * 8 != enemy_tank[enemy_id].y)
 		return false;
 
-	if (4 == enemy_tank[enemy_id].x)//æ•Œæ–¹å¦å…‹å¤„äºä¸­è½´çº¿
+	if (4 == enemy_tank[enemy_id].x)//µĞ·½Ì¹¿Ë´¦ÓÚÖĞÖáÏß
 	{
 		int x = 4;
 		int y1 = myside * 8, y2 = enemy_tank[enemy_id].y;
@@ -168,7 +169,7 @@ bool in_range(int enemy_id)//é‡è½½åçš„å‡½æ•°ï¼Œåˆ¤æ–­åŸºåœ°æ˜¯å¦ä¼šè¢«æ‰“ä¸­
 		return true;
 	}
 
-	else if (myside * 8 == enemy_tank[enemy_id].y)//æ•Œæ–¹å¦å…‹å’ŒåŸºåœ°åœ¨åŒä¸€æ¨ªçº¿ä¸Š
+	else if (myside * 8 == enemy_tank[enemy_id].y)//µĞ·½Ì¹¿ËºÍ»ùµØÔÚÍ¬Ò»ºáÏßÉÏ
 	{
 		int y = myside * 8;
 		int x1 = 4, x2 = enemy_tank[enemy_id].x;
@@ -190,10 +191,10 @@ bool in_range(int enemy_id)//é‡è½½åçš„å‡½æ•°ï¼Œåˆ¤æ–­åŸºåœ°æ˜¯å¦ä¼šè¢«æ‰“ä¸­
 	}
 }
 
-double get_distance(int x, int y, int id)//æœç´¢æ”»å‡»åœ°æ–¹åŸºåœ°çš„æœ€çŸ­è·ç¦»
+double get_distance(int x, int y, int id)//ËÑË÷¹¥»÷µØ·½»ùµØµÄ×î¶Ì¾àÀë
 {
-	//å¢åŠ æ–°åŠŸèƒ½ï¼šè®¡ç®—æ•Œæ–¹è·ç¦»ï¼Œæ•Œæ–¹å¦å…‹ç”¨ID 2 3ä»£è¡¨
-	//ä¸ç¡®å®šæœ‰æ²¡æœ‰bug
+	//Ôö¼ÓĞÂ¹¦ÄÜ£º¼ÆËãµĞ·½¾àÀë£¬µĞ·½Ì¹¿ËÓÃID 2 3´ú±í
+	//²»È·¶¨ÓĞÃ»ÓĞbug
 	Tank *tank;
 	if (id < 2)
 		tank = &self_tank[id];
@@ -224,7 +225,7 @@ double get_distance(int x, int y, int id)//æœç´¢æ”»å‡»åœ°æ–¹åŸºåœ°çš„æœ€çŸ­è·ç
 	while (!q.empty())
 	{   
 		point temp = q.top();
-		if (frontier[temp.y][temp.x] == 0)//å¦‚æœä¸åœ¨æ¢ç´¢é›†ä¸­ï¼Œå°†å…¶ç§»é™¤
+		if (frontier[temp.y][temp.x] == 0)//Èç¹û²»ÔÚÌ½Ë÷¼¯ÖĞ£¬½«ÆäÒÆ³ı
 		{
 		//	cout << "i wonder if this ever worked" << endl;
 			q.pop();
@@ -248,7 +249,7 @@ double get_distance(int x, int y, int id)//æœç´¢æ”»å‡»åœ°æ–¹åŸºåœ°çš„æœ€çŸ­è·ç
 				if (frontier[next.y][next.x] == 0)
 					continue;
 			}
-			if (next.y == 8 * (1 - myside) and (i == 1 or i == 3) and (state[next.y][next.x] == 0 or state[next.y][next.x] & water)) next.cost = temp.cost;//åªè¦ç‚®å¼¹èƒ½æ‰“åˆ°å³å¯ï¼Œä¸ç”¨èµ°åˆ°æ—è¾¹
+			if (next.y == 8 * (1 - myside) and (i == 1 or i == 3) and (state[next.y][next.x] == 0 or state[next.y][next.x] & water)) next.cost = temp.cost;//Ö»ÒªÅÚµ¯ÄÜ´òµ½¼´¿É£¬²»ÓÃ×ßµ½ÅÔ±ß
 			if ((state[next.y][next.x] & steel) or (state[next.y][next.x] & water)) continue;
 			for (int j = 0; j < 2; j++)
 			{
@@ -282,7 +283,7 @@ double get_distance(int x, int y, int id)//æœç´¢æ”»å‡»åœ°æ–¹åŸºåœ°çš„æœ€çŸ­è·ç
 	return min_step;
 }
 
-Distances route_search(int id)//ä¸Šä¸‹å·¦å³å››ä¸ªæ–¹å‘èµ°å‘æ•Œæ–¹åŸºåœ°æ‰€éœ€çš„æœ€çŸ­è·ç¦»ï¼Œæ•Œæ–¹å¦å…‹æš‚ä¸”å½“ç –å—ç®— idä¸ºå¦å…‹ç¼–å·
+Distances route_search(int id)//ÉÏÏÂ×óÓÒËÄ¸ö·½Ïò×ßÏòµĞ·½»ùµØËùĞèµÄ×î¶Ì¾àÀë£¬µĞ·½Ì¹¿ËÔİÇÒµ±×©¿éËã idÎªÌ¹¿Ë±àºÅ
 {
 	Distances temp;
 	for (int i = 0; i < 4; i++)
@@ -299,7 +300,7 @@ Distances route_search(int id)//ä¸Šä¸‹å·¦å³å››ä¸ªæ–¹å‘èµ°å‘æ•Œæ–¹åŸºåœ°æ‰€éœ€
 
 double evaluate()
 {
-	//å¢åŠ äº†ä¼°å€¼å‡½æ•°
+	//Ôö¼ÓÁË¹ÀÖµº¯Êı
 	double eval_self = 0, eval_enemy = 0;
 	if (!self_tank[0].dead and !self_tank[1].dead)
 	{
@@ -309,7 +310,7 @@ double evaluate()
 		if (a < b)
 			eval_self = 2 / a + 1 / b;
 		else
-			eval_self = 1 / b + 2 / b;//è‹¥éƒ½å­˜æ´»ï¼Œä¼°å€¼ä¸ºç¦»å¾—è¿‘çš„å¦å…‹çš„è·ç¦»çš„å€’æ•°çš„ä¸¤å€ åŠ ä¸Šç¦»å¾—è¿œçš„å¦å…‹
+			eval_self = 1 / b + 2 / b;//Èô¶¼´æ»î£¬¹ÀÖµÎªÀëµÃ½üµÄÌ¹¿ËµÄ¾àÀëµÄµ¹ÊıµÄÁ½±¶ ¼ÓÉÏÀëµÃÔ¶µÄÌ¹¿Ë
 	}
 	else
 	{
@@ -333,7 +334,7 @@ double evaluate()
 		if (a < b)
 			eval_enemy = 2 / a + 1 / b;
 		else
-			eval_enemy = 1 / b + 2 / b;//è‹¥éƒ½å­˜æ´»ï¼Œä¼°å€¼ä¸ºç¦»å¾—è¿‘çš„å¦å…‹çš„è·ç¦»åŠ ä¸Šç¦»å¾—è¿œçš„çš„ä¸¤å€
+			eval_enemy = 1 / b + 2 / b;//Èô¶¼´æ»î£¬¹ÀÖµÎªÀëµÃ½üµÄÌ¹¿ËµÄ¾àÀë¼ÓÉÏÀëµÃÔ¶µÄµÄÁ½±¶
 	}
 	else
 	{
@@ -352,7 +353,7 @@ double evaluate()
 	return eval_self - eval_enemy;
 }
 
-bool valid(int id, int action)//æœ€ç²—ç•¥çš„æ£€æŸ¥
+bool valid(int id, int action)//×î´ÖÂÔµÄ¼ì²é
 {
 #ifdef DEBUG
 	cout << "action: " << id << ' ' << action << endl << endl;
@@ -362,7 +363,7 @@ bool valid(int id, int action)//æœ€ç²—ç•¥çš„æ£€æŸ¥
 	if (self_tank[id].y == (myside) * 8)
 	{
 	//	if (self_tank[id].x < 4 && action == 5)return false;
-	//	if (self_tank[id].x > 4 && action == 7)return false;// è¿™ä¸ªæ¯”è¾ƒå€¼å¾—å•†æ¦·ï¼Œå…ˆæ³¨é‡Šæ‰
+	//	if (self_tank[id].x > 4 && action == 7)return false;// Õâ¸ö±È½ÏÖµµÃÉÌÈ¶£¬ÏÈ×¢ÊÍµô
 	}
 	if (action == -1)return true;
 	if (action >= 4)
@@ -393,13 +394,13 @@ bool valid(int id, int action)//æœ€ç²—ç•¥çš„æ£€æŸ¥
 			if ((xx - self_tank[i].x == 0) && (yy - self_tank[i].y == 0))
 				return false;
 		}
-	}*/ //å› ä¸ºæœ‰äº†tank = 16æ‰€ä»¥è¿™ä¸€éƒ¨åˆ†å¤§æ¦‚ä¸ç”¨å†ç•™ç€äº†
+	}*/ //ÒòÎªÓĞÁËtank = 16ËùÒÔÕâÒ»²¿·Ö´ó¸Å²»ÓÃÔÙÁô×ÅÁË
 	return true;
 }
 
-bool enemy_near(int x, int y, int action)//åˆ¤æ–­æ•Œäººæ˜¯å¦åœ¨ç‚®å¼¹è½¨è¿¹æ—  å³é¢„åˆ¤æœ‰æ²¡æœ‰æ‰“ä¸­çš„å¯èƒ½æ€§ åªåˆ¤æ–­å·¦å³ä¸¤ä¾§ å› ä¸ºç›´çº¿æœ‰in_range
+bool enemy_near(int x, int y, int action)//ÅĞ¶ÏµĞÈËÊÇ·ñÔÚÅÚµ¯¹ì¼£ÅÔ  ¼´Ô¤ÅĞÓĞÃ»ÓĞ´òÖĞµÄ¿ÉÄÜĞÔ Ö»ÅĞ¶Ï×óÓÒÁ½²à ÒòÎªÖ±ÏßÓĞin_range
 {
-	int dir = action % 2; //0 2å¯¹åº” 1 3   1 3 å¯¹åº” 0 2
+	int dir = action % 2; //0 2¶ÔÓ¦ 1 3   1 3 ¶ÔÓ¦ 0 2
 	int x1, x2, y1, y2;
 	x1 = x + px[dir], y1 = y + py[dir], x2 = x + px[dir + 2], y2 = y + py[dir + 2];
 	for (int i = 0; i < 2; i++)
@@ -412,22 +413,22 @@ bool enemy_near(int x, int y, int action)//åˆ¤æ–­æ•Œäººæ˜¯å¦åœ¨ç‚®å¼¹è½¨è¿¹æ— 
 	return false;
 }
 
-bool cut(int id, int action)//æ‰‹åŠ¨å‰ªæç­–ç•¥ trueä¸è¡Œ falseå¯ä»¥
+bool cut(int id, int action)//ÊÖ¶¯¼ôÖ¦²ßÂÔ true²»ĞĞ false¿ÉÒÔ
 {
-	int state_back[9][9];//å¤‡ä»½åœ°å›¾
+	int state_back[9][9];//±¸·İµØÍ¼
 	memcpy(state_back, state, sizeof(state));
-	if (action >= 0 and action < 4)//åˆ¤æ–­è¡ŒåŠ¨åæœ‰æ²¡æœ‰å¯èƒ½è¢«æ‰“
+	if (action >= 0 and action < 4)//ÅĞ¶ÏĞĞ¶¯ºóÓĞÃ»ÓĞ¿ÉÄÜ±»´ò
 	{
-		if (!in_map(self_tank[id].x + px[action], self_tank[id].y + py[action])) return false; //new åœ°å›¾å¤–
+		if (!in_map(self_tank[id].x + px[action], self_tank[id].y + py[action])) return false; //new µØÍ¼Íâ
 		int x = self_tank[id].x, y = self_tank[id].y;
 		self_tank[id].x += px[action];
 		self_tank[id].y += py[action];
-		if ((in_range(id, 0) and enemy_tank[0].shoot_cnt > 0) or (in_range(id, 1) and enemy_tank[1].shoot_cnt > 0))//æ•Œäººæœ‰ç‚®å¼¹ï¼Œæ²¡æœ‰ç‚®å¼¹å¯ä»¥è¶æœºå†²è¿‡å»
+		if ((in_range(id, 0) and enemy_tank[0].shoot_cnt > 0) or (in_range(id, 1) and enemy_tank[1].shoot_cnt > 0))//µĞÈËÓĞÅÚµ¯£¬Ã»ÓĞÅÚµ¯¿ÉÒÔ³Ã»ú³å¹ıÈ¥
 		{
 			self_tank[id].x = x, self_tank[id].y = y;
 			return true;
 		}
-		if (in_range(0)  or in_range(1))//ä¸ç®¡æ•Œäººæœ‰æ²¡æœ‰ç‚®å¼¹éƒ½å¾ˆç‰™ç™½
+		if (in_range(0)  or in_range(1))//²»¹ÜµĞÈËÓĞÃ»ÓĞÅÚµ¯¶¼ºÜÑÀ°×
 		{
 			self_tank[id].x = x, self_tank[id].y = y;
 			return true;
@@ -437,25 +438,25 @@ bool cut(int id, int action)//æ‰‹åŠ¨å‰ªæç­–ç•¥ trueä¸è¡Œ falseå¯ä»¥
 	if (action >= 4)
 	{
 		
-		if (in_range(id, 0) or in_range(id, 1))//æ”¹åŠ¨ï¼Œé™åˆ¶äº†å‘å°„ç‚®å¼¹çš„æ–¹å‘ï¼Œå¦‚æœå·²ç»è¿›å…¥å°„ç¨‹åªèƒ½æœæ•Œäººæ‰“
+		if (in_range(id, 0) or in_range(id, 1))//¸Ä¶¯£¬ÏŞÖÆÁË·¢ÉäÅÚµ¯µÄ·½Ïò£¬Èç¹ûÒÑ¾­½øÈëÉä³ÌÖ»ÄÜ³¯µĞÈË´ò
 		{
-			//cout << "inrange bug?" << endl;
+			//cout << "IN_RANGE!!!!!!!" << endl;
 			if (in_range(id, 0))
 			{
 				if ((enemy_tank[0].x - self_tank[id].x) == abs(enemy_tank[0].x - self_tank[id].x) * px[action - 4]
-					and (enemy_tank[0].x - self_tank[id].x) == abs(enemy_tank[0].x - self_tank[id].x) * px[action - 4])
+					and (enemy_tank[0].y - self_tank[id].y) == abs(enemy_tank[0].y - self_tank[id].y) * py[action - 4])
 					return false;
 				else return true;
 			}
 			else
 			{
 				if ((enemy_tank[1].x - self_tank[id].x) == abs(enemy_tank[1].x - self_tank[id].x) * px[action - 4]
-					and (enemy_tank[1].x - self_tank[id].x) == abs(enemy_tank[1].x - self_tank[id].x) * px[action - 4])
+					and (enemy_tank[1].y - self_tank[id].y) == abs(enemy_tank[1].y - self_tank[id].y) * py[action - 4])
 					return false;
 				else return true;
 			}
 		}
-		//å¯ä»¥æ‰“åˆ°æ•Œäºº
+		//¿ÉÒÔ´òµ½µĞÈË
 		int x = self_tank[id].x + px[action - 4], y = self_tank[id].y + py[action - 4];
 		while (in_map(x, y))
 		{
@@ -466,50 +467,50 @@ bool cut(int id, int action)//æ‰‹åŠ¨å‰ªæç­–ç•¥ trueä¸è¡Œ falseå¯ä»¥
 #endif // DEBUG
 
 			
-			if ( (state[y][x] & steel) or (y == myside * 8 and x == 4) or (y == self_tank[1 - id].y  and x == self_tank[1 - id].x) )//æ‰“ä¸­é’¢å—æˆ–è€…è‡ªå·±
+			if ( (state[y][x] & steel) or (y == myside * 8 and x == 4) or (y == self_tank[1 - id].y  and x == self_tank[1 - id].x) )//´òÖĞ¸Ö¿é»òÕß×Ô¼º
 				return true;
-			if (enemy_near(x, y, action)) return false;//é¢„åˆ¤å¯ä»¥æ‰“åˆ°æ•Œäºº
-			if (state[y][x] & brick)//å¦‚æœæ˜¯ç –å—
+			if (enemy_near(x, y, action)) return false;//Ô¤ÅĞ¿ÉÒÔ´òµ½µĞÈË
+			if (state[y][x] & brick)//Èç¹ûÊÇ×©¿é
 			{
 				state[y][x] = 0;
-				if ((in_range(id, 0) and enemy_tank[0].shoot_cnt > 0) or (in_range(id, 1) and enemy_tank[1].shoot_cnt > 0))//ç –å—æ²¡äº†ç›´æ¥ç™½ç»™
+				if ((in_range(id, 0) and enemy_tank[0].shoot_cnt > 0) or (in_range(id, 1) and enemy_tank[1].shoot_cnt > 0))//×©¿éÃ»ÁËÖ±½Ó°×¸ø
 				{
-					memcpy(state, state_back, sizeof(state));//å¤åŸåœ°å›¾
+					memcpy(state, state_back, sizeof(state));//¸´Ô­µØÍ¼
 					return true;
 				}
-				if (in_range(0) or in_range(1))//æ•Œäººåˆ°è€å®¶é—¨å£
+				if (in_range(0) or in_range(1))//µĞÈËµ½ÀÏ¼ÒÃÅ¿Ú
 				{
-					memcpy(state, state_back, sizeof(state));//å¤åŸåœ°å›¾
+					memcpy(state, state_back, sizeof(state));//¸´Ô­µØÍ¼
 					return true;
 				}
 				else
-					return false;//åªæ˜¯æ‰“åˆ°äº†ç –å—
+					return false;//Ö»ÊÇ´òµ½ÁË×©¿é
 			}
 			x += px[action - 4], y += py[action - 4];
-		}//å¦‚æœç»“æŸï¼Œè¯´æ˜ä»€ä¹ˆéƒ½ä¸ä¼šæ‰“åˆ°
-		memcpy(state, state_back, sizeof(state));//å¤åŸåœ°å›¾
+		}//Èç¹û½áÊø£¬ËµÃ÷Ê²Ã´¶¼²»»á´òµ½
+		memcpy(state, state_back, sizeof(state));//¸´Ô­µØÍ¼
 		return true;
 	}
-	return false;//ä»¥ä¸Šæƒ…å†µå¦‚æœéƒ½æ²¡æœ‰å‘ç”Ÿé‚£å¤§æ¦‚å¯ä»¥ï¼Ÿ
+	return false;//ÒÔÉÏÇé¿öÈç¹û¶¼Ã»ÓĞ·¢ÉúÄÇ´ó¸Å¿ÉÒÔ£¿
 }
 
-point move_generator()//ç”¨pointè£…ä¸€ä¸‹ä¸¤ä¸ªè¡ŒåŠ¨ åŸæœ¬çš„è·¯å¾„costæ­£å¥½å½“å±€é¢ä¼°å€¼ï¼ˆæ‰‹åŠ¨æ»‘ç¨½
+point move_generator()//ÓÃpoint×°Ò»ÏÂÁ½¸öĞĞ¶¯ Ô­±¾µÄÂ·¾¶costÕıºÃµ±¾ÖÃæ¹ÀÖµ£¨ÊÖ¶¯»¬»ü
 {
-	//åŸåˆ™ä¸Šå¦å…‹ä¸¤ä¸ªä¸€ç»„è¿›è¡Œæœç´¢ï¼Œä½†ä¹Ÿä¼šè€ƒè™‘åˆ«çš„
-	//å³å·±æ–¹0 å¯¹æ–¹1 å’Œ å·±æ–¹1 å¯¹æ–¹0 å› ä¸ºåˆ†å¸ƒåœ¨ä¸­è½´çº¿åŒä¸€ä¾§
-	/*ç›®å‰æƒ³å¥½çš„å‰ªæè§„åˆ™
-	1.è¡ŒåŠ¨åä¼šä½¿è‡ªå·±æˆ–è€…åŸºåœ°æš´éœ²åœ¨æ•Œäººç«åŠ›ä¹‹ä¸‹
-	2.æ‰“äº†ä¸€ç‚®ï¼Œä½†æ˜¯ä»€ä¹ˆä¹Ÿæ²¡æœ‰å‘ç”Ÿ
-	3.æ‰å¤´å¾€å›(è¿™ä¸ªå°±é€šè¿‡ä¼°å€¼è§£å†³å§)
-	4.æ‰“è‡ªå·±çš„å¦å…‹æˆ–è€…åŸºåœ°ï¼Œè¿™ç§æƒ…å†µä¸‹å¯èƒ½éœ€è¦ä»”ç»†ç‰¹åˆ¤
-	5.ä¸åˆæ³•è¡ŒåŠ¨ï¼ˆæˆ‘è§‰å¾—è¿™ä¸ªå¯èƒ½ä¸ç”¨è¯´ï¼‰*/
-	//ä»¥ä¸Šéƒ½æ˜¯é€šè¿‡è‡ªå·±çš„è¡ŒåŠ¨å°±å¯ä»¥å‰ªæ‰çš„
-	//-1ä½œä¸ºä¼˜å…ˆçº§æœ€ä½çš„è¡ŒåŠ¨åœ¨æŸäº›ç‰¹æ®Šæƒ…å†µä¸‹é‡‡å–
-	//å¦å¤–å¯èƒ½å‡ºç°æ— è®ºå¦‚ä½•æ­»è·¯ä¸€æ¡çš„æƒ…å†µ
-	//è¿™ç§æƒ…å†µä¸‹å°±å°½é‡æ‰“ä¸€ä¸ªç –å—æˆ–è€…ä¸ºå¦ä¸€è¾†äº‰å–æ—¶é—´
-	//æŠŠ-1æ”¹ä¸ºæ— è®ºå¦‚ä½•éƒ½å¯è¡Œäº†
-	bool act0[9], act1[9];//tank0 1çš„è¡ŒåŠ¨
-	memset(act0, 0, sizeof(act0)), memset(act1, 0, sizeof(act1));//0ä»£è¡¨å¯è¡Œï¼Œ1ä»£è¡¨ä¸å¯è¡Œ
+	//Ô­ÔòÉÏÌ¹¿ËÁ½¸öÒ»×é½øĞĞËÑË÷£¬µ«Ò²»á¿¼ÂÇ±ğµÄ
+	//¼´¼º·½0 ¶Ô·½1 ºÍ ¼º·½1 ¶Ô·½0 ÒòÎª·Ö²¼ÔÚÖĞÖáÏßÍ¬Ò»²à
+	/*Ä¿Ç°ÏëºÃµÄ¼ôÖ¦¹æÔò
+	1.ĞĞ¶¯ºó»áÊ¹×Ô¼º»òÕß»ùµØ±©Â¶ÔÚµĞÈË»ğÁ¦Ö®ÏÂ
+	2.´òÁËÒ»ÅÚ£¬µ«ÊÇÊ²Ã´Ò²Ã»ÓĞ·¢Éú
+	3.µôÍ·Íù»Ø(Õâ¸ö¾ÍÍ¨¹ı¹ÀÖµ½â¾ö°É)
+	4.´ò×Ô¼ºµÄÌ¹¿Ë»òÕß»ùµØ£¬ÕâÖÖÇé¿öÏÂ¿ÉÄÜĞèÒª×ĞÏ¸ÌØÅĞ
+	5.²»ºÏ·¨ĞĞ¶¯£¨ÎÒ¾õµÃÕâ¸ö¿ÉÄÜ²»ÓÃËµ£©*/
+	//ÒÔÉÏ¶¼ÊÇÍ¨¹ı×Ô¼ºµÄĞĞ¶¯¾Í¿ÉÒÔ¼ôµôµÄ
+	//-1×÷ÎªÓÅÏÈ¼¶×îµÍµÄĞĞ¶¯ÔÚÄ³Ğ©ÌØÊâÇé¿öÏÂ²ÉÈ¡
+	//ÁíÍâ¿ÉÄÜ³öÏÖÎŞÂÛÈçºÎËÀÂ·Ò»ÌõµÄÇé¿ö
+	//ÕâÖÖÇé¿öÏÂ¾Í¾¡Á¿´òÒ»¸ö×©¿é»òÕßÎªÁíÒ»Á¾ÕùÈ¡Ê±¼ä
+	//°Ñ-1¸ÄÎªÎŞÂÛÈçºÎ¶¼¿ÉĞĞÁË
+	bool act0[9], act1[9];//tank0 1µÄĞĞ¶¯
+	memset(act0, 0, sizeof(act0)), memset(act1, 0, sizeof(act1));//0´ú±í¿ÉĞĞ£¬1´ú±í²»¿ÉĞĞ
 	point actions;
 	for (int i = 1; i < 9; i++)
 	{
@@ -635,7 +636,7 @@ int main()
 #ifdef _BOTZONE_ONLINE
 	reader.parse(cin, all);
 #else
-	string s = string("{\"requests\":[{\"brickfield\":[4751144,4412944,11006096],\"forestfield\":[126058496,3932640,3599],\"mySide\":1,\"steelfield\":[0,43008,0],\"waterfield\":[0,8388616,0]},{\"action\":[6,2],\"destroyed_blocks\":[2,1,6,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,-2,-2]},{\"action\":[2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[7,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,-2,-2]},{\"action\":[2,-2],\"destroyed_blocks\":[3,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,2,-2,-2]},{\"action\":[1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,2,7,4]},{\"action\":[-1,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,2],\"final_enemy_positions\":[-1,-1,7,5]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,7,5]}],\"responses\":[[4,0,[\"tank\",0,0,15.3,10000,1,17.5,15.3,2,10000000,15.3,3,18.4,15.3,\"tank\",1,0,16.4,10000,1,19.5,16.4,2,10000000,16.4,3,16.4,16.4]],[0,0,[\"tank\",0,0,15.3,10000,1,17.5,15.3,2,10000000,15.3,3,20.4,15.3,\"tank\",1,0,14.3,10000,1,16.3,14.3,2,16.3,14.3,3,14.3,14.3]],[0,0,[\"tank\",0,0,14.3,10000,1,15.4,14.3,2,17.4,14.3,3,16.3,14.3,\"tank\",1,0,13.3,10000,1,15.3,13.3,2,15.3,13.3,3,13.3,13.3]],[0,1,[\"tank\",0,0,13.3,10000,1,13.3,13.3,2,16.4,13.3,3,17.3,13.3,\"tank\",1,0,10000000,10000,1,16.3,10000,2,14.3,16.3,3,12.3,14.3]],[1,4,[\"tank\",0,0,10000000,10000,1,11.2,10000,2,14.3,11.2,3,10000000,11.2,\"tank\",1,0,10000000,10000,1,17.3,10000,2,15.3,17.3,3,13.3,15.3]],[0,0,[\"tank\",0,0,10.2,10000,1,13.3,10.2,2,15.3,10.2,3,17.3,10.2,\"tank\",1,0,10000000,10000,1,17.3,10000,2,15.3,17.3,3,13.3,15.3]],[4,4,[\"tank\",0,0,9.2,10000,1,12.2,9.2,2,14.3,9.2,3,10000000,9.2,\"tank\",1,0,10000000,10000,1,10000000,10000,2,14.3,10000,3,10000000,14.3]],[-1,2,[\"tank\",0,0,9.2,10000,1,13.2,9.2,2,16.3,9.2,3,10000000,9.2,\"tank\",1,0,10000000,10000,1,10000000,10000,2,14.3,1000") + string("0,3,10000000,14.3]]]}");
+	string s = string("{\"requests\":[{\"brickfield\":[21167146,4937360,44169748],\"forestfield\":[12320768,127926319,488],\"mySide\":1,\"steelfield\":[512,43008,131072],\"waterfield\":[33554432,1048640,2]},{\"action\":[6,6],\"destroyed_blocks\":[2,1,2,7,6,1,6,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,6,0]},{\"action\":[2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,6,1]},{\"action\":[2,6],\"destroyed_blocks\":[2,6,6,2],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,6,1]},{\"action\":[-2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,6,2]},{\"action\":[-2,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[3,4,4,5,5,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,-2,-2]},{\"action\":[4,-2],\"destroyed_blocks\":[1,5,3,1,5,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,5,4]},{\"action\":[6,6],\"destroyed_blocks\":[3,0,3,7,4,6,5,8],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,5,4]},{\"action\":[2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[4,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroye") + string("d_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,7],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,7],\"final_enemy_positions\":[-1,-1,5,7]},{\"action\":[-1,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,3],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]}],\"responses\":[[4,4,[\"tank\",0,0,14.4,10000,1,17.5,14.4,2,10000000,14.4,3,15.5,14.4,\"tank\",1,0,15.5,10000,1,15.5,15.5,2,10000000,15.5,3,17.5,15.5]],[0,0,[\"tank\",0,0,14.4,10000,1,19.5,14.4,2,10000000,14.4,3,17.5,14.4,\"tank\",1,0,15.5,10000,1,17.5,15.5,2,10000000,15.5,3,17.5,15.5]],[0,4,[\"tank\",0,0,13.4,10000,1,15.4,13.4,2,16.5,13.4,3,13.4,13.4,\"tank\",1,0,13.4,10000,1,13.4,13.4,2,16.5,13.4,3,16.3,13.4]],[0,0,[\"tank\",0,0,12.4,10000,1,14.4,12.4,2,15.5,12.4,3,12.4,12.4,\"tank\",1,0,13.4,10000,1,15.4,13.4,2,19.6,13.4,3,17.4,13.4]],[3,1,[\"tank\",0,0,10000000,10000,1,15.4,10000,2,13.4,15.4,3,11.4,13.4,\"tank\",1,0,10000000,10000,1,12.4,10000,2,15.5,12.4,3,10000000,12.4]],[7,0,[\"tank\",0,0,10.3,10000,1,15.3,10.3,2,13.3,10.3,3,11.3,10.3,\"tank\",1,0,10.3,10000,1,12.") + string("3,10.3,2,15.4,10.3,3,17.4,10.3]],[3,0,[\"tank\",0,0,9.299999999999999,10000,1,15.3,9.299999999999999,2,13.3,9.299999999999999,3,10.2,9.299999999999999,\"tank\",1,0,8.2,10000,1,11.3,8.2,2,14.4,8.2,3,10000000,8.2]],[7,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,12.3,10.3,3,10.3,10.3,\"tank\",1,0,8.299999999999999,10000,1,10000000,8.299999999999999,2,12.3,8.299999999999999,3,10000000,8.299999999999999]],[-1,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,13.2,10.3,3,9.2,10.3,\"tank\",1,0,7.199999999999999,10000,1,10000000,7.199999999999999,2,12.3,7.199999999999999,3,10000000,7.199999999999999]],[6,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,11.2,10.3,3,9.2,10.3,\"tank\",1,0,7.199999999999999,10000,1,10000000,7.199999999999999,2,12.3,7.199999999999999,3,10000000,7.199999999999999]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[6,4,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,4,[\"tank\",0,0,10.1,10000,1,12.1,10.1,2,14.2,10.1,3,11.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6") + string(".1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[3,0,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[-1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[-1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[4,4,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,9.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[4,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[-1,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]]]}");
 
 	reader.parse(s, all);
 #endif
@@ -689,12 +690,12 @@ int main()
 		{
 			for (int j = 0; j < 2; j++)
 			{
-				int x_t, y_t;//tä»£è¡¨temp
+				int x_t, y_t;//t´ú±ítemp
 				x_t = input[i]["final_enemy_positions"][2 * j].asInt();
 				y_t = input[i]["final_enemy_positions"][2 * j + 1].asInt();
 				if (x_t == -2 and y_t == -2)
 				{
-					if (enemy_tank[j].in_bush == 0)//ä¸Šä¸€å›åˆå°šæœªè¿›å…¥æ ‘æ—ï¼Œé‚£ä¹ˆè¿™ä¸€å›åˆåœ¨æ ‘æ—ä¸­ä½ç½®æ˜¯å¯ä»¥ç¡®å®šçš„
+					if (enemy_tank[j].in_bush == 0)//ÉÏÒ»»ØºÏÉĞÎ´½øÈëÊ÷ÁÖ£¬ÄÇÃ´ÕâÒ»»ØºÏÔÚÊ÷ÁÖÖĞÎ»ÖÃÊÇ¿ÉÒÔÈ·¶¨µÄ
 					{
 						int act = input[i]["action"][j].asInt();
 						enemy_tank[j].x += px[act];
@@ -703,7 +704,7 @@ int main()
 						enemy_tank[j].in_bush = 1;
 						enemy_tank[j].possible[enemy_tank[j].y][enemy_tank[j].x] = 1;
 					}
-					else //ä¸Šä¸€å›åˆä¸åœ¨æ ‘æ—å†…ï¼Œæ ¹æ®å‚¨å­˜çš„possibleæ•°ç»„è®¡ç®—å‡ºè¿™ä¸€å›åˆå¯èƒ½åœ¨çš„æ‰€æœ‰ä½ç½®
+					else //ÉÏÒ»»ØºÏ²»ÔÚÊ÷ÁÖÄÚ£¬¸ù¾İ´¢´æµÄpossibleÊı×é¼ÆËã³öÕâÒ»»ØºÏ¿ÉÄÜÔÚµÄËùÓĞÎ»ÖÃ
 					{
 						enemy_tank[j].cal_pos();
 					}
@@ -719,7 +720,7 @@ int main()
 				//enemy_position[j] = input[i]["final_enemy_positions"][j].asInt(), seed += enemy_position[j], seed ^= enemy_position[j];
 			}
 				
-			for (int j = 0; j < input[i]["destroyed_blocks"].size(); j += 2)//å¯ä»¥æ ¹æ®è¿™ä¸ªæ¨ç†æ•Œæ–¹ä½ç½®,æš‚æ—¶è¿˜æ²¡åš
+			for (int j = 0; j < input[i]["destroyed_blocks"].size(); j += 2)//¿ÉÒÔ¸ù¾İÕâ¸öÍÆÀíµĞ·½Î»ÖÃ,ÔİÊ±»¹Ã»×ö
 			{
 				int x = input[i]["destroyed_blocks"][j].asInt();
 				int y = input[i]["destroyed_blocks"][j + 1].asInt();
@@ -729,10 +730,10 @@ int main()
 		}
 	}
 	
-	for (int i = 0; i < 2; i++)//æŠŠtankæ‰€åœ¨ä½ç½®æ›´æ–°ä¸º16
+	for (int i = 0; i < 2; i++)//°ÑtankËùÔÚÎ»ÖÃ¸üĞÂÎª16
 	{
 		state[self_tank[i].y][self_tank[i].x] = 16;
-		if (enemy_tank[i].x >= 0)//æ²¡æ­»ä¸”ä¸åœ¨è‰ä¸›é‡Œ
+		if (enemy_tank[i].x >= 0)//Ã»ËÀÇÒ²»ÔÚ²İ´ÔÀï
 		{
 			state[enemy_tank[i].y][enemy_tank[i].x] = 16;
 		}
@@ -823,13 +824,13 @@ int main()
 }
 
 
-// è¿è¡Œç¨‹åº: Ctrl + F5 æˆ–è°ƒè¯• >â€œå¼€å§‹æ‰§è¡Œ(ä¸è°ƒè¯•)â€èœå•
-// è°ƒè¯•ç¨‹åº: F5 æˆ–è°ƒè¯• >â€œå¼€å§‹è°ƒè¯•â€èœå•
+// ÔËĞĞ³ÌĞò: Ctrl + F5 »òµ÷ÊÔ >¡°¿ªÊ¼Ö´ĞĞ(²»µ÷ÊÔ)¡±²Ëµ¥
+// µ÷ÊÔ³ÌĞò: F5 »òµ÷ÊÔ >¡°¿ªÊ¼µ÷ÊÔ¡±²Ëµ¥
 
-// å…¥é—¨æç¤º: 
-//   1. ä½¿ç”¨è§£å†³æ–¹æ¡ˆèµ„æºç®¡ç†å™¨çª—å£æ·»åŠ /ç®¡ç†æ–‡ä»¶
-//   2. ä½¿ç”¨å›¢é˜Ÿèµ„æºç®¡ç†å™¨çª—å£è¿æ¥åˆ°æºä»£ç ç®¡ç†
-//   3. ä½¿ç”¨è¾“å‡ºçª—å£æŸ¥çœ‹ç”Ÿæˆè¾“å‡ºå’Œå…¶ä»–æ¶ˆæ¯
-//   4. ä½¿ç”¨é”™è¯¯åˆ—è¡¨çª—å£æŸ¥çœ‹é”™è¯¯
-//   5. è½¬åˆ°â€œé¡¹ç›®â€>â€œæ·»åŠ æ–°é¡¹â€ä»¥åˆ›å»ºæ–°çš„ä»£ç æ–‡ä»¶ï¼Œæˆ–è½¬åˆ°â€œé¡¹ç›®â€>â€œæ·»åŠ ç°æœ‰é¡¹â€ä»¥å°†ç°æœ‰ä»£ç æ–‡ä»¶æ·»åŠ åˆ°é¡¹ç›®
-//   6. å°†æ¥ï¼Œè‹¥è¦å†æ¬¡æ‰“å¼€æ­¤é¡¹ç›®ï¼Œè¯·è½¬åˆ°â€œæ–‡ä»¶â€>â€œæ‰“å¼€â€>â€œé¡¹ç›®â€å¹¶é€‰æ‹© .sln æ–‡ä»¶
+// ÈëÃÅÌáÊ¾: 
+//   1. Ê¹ÓÃ½â¾ö·½°¸×ÊÔ´¹ÜÀíÆ÷´°¿ÚÌí¼Ó/¹ÜÀíÎÄ¼ş
+//   2. Ê¹ÓÃÍÅ¶Ó×ÊÔ´¹ÜÀíÆ÷´°¿ÚÁ¬½Óµ½Ô´´úÂë¹ÜÀí
+//   3. Ê¹ÓÃÊä³ö´°¿Ú²é¿´Éú³ÉÊä³öºÍÆäËûÏûÏ¢
+//   4. Ê¹ÓÃ´íÎóÁĞ±í´°¿Ú²é¿´´íÎó
+//   5. ×ªµ½¡°ÏîÄ¿¡±>¡°Ìí¼ÓĞÂÏî¡±ÒÔ´´½¨ĞÂµÄ´úÂëÎÄ¼ş£¬»ò×ªµ½¡°ÏîÄ¿¡±>¡°Ìí¼ÓÏÖÓĞÏî¡±ÒÔ½«ÏÖÓĞ´úÂëÎÄ¼şÌí¼Óµ½ÏîÄ¿
+//   6. ½«À´£¬ÈôÒªÔÙ´Î´ò¿ª´ËÏîÄ¿£¬Çë×ªµ½¡°ÎÄ¼ş¡±>¡°´ò¿ª¡±>¡°ÏîÄ¿¡±²¢Ñ¡Ôñ .sln ÎÄ¼ş
