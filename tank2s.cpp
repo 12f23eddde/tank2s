@@ -1,4 +1,4 @@
-
+//Mt.Nomad
 #include <stack>
 #include <set>
 #include <string>
@@ -9,20 +9,25 @@
 #include <queue>
 #include <vector>
 #include "jsoncpp/json.h"
-
 using namespace std;
-const int none = 0, brick = 1, forest = 2, steel = 4, water = 8, tank = 16;
-const bool DebugMode = 0;
-int state[9][9];
-int myside;
-int rounds;//回合数
+///////////////////
+#define INF INT16_MAX;
+const int8_t none = 0, brick = 1, forest = 2, steel = 4, water = 8, tank = 16;
+int8_t state[9][9] = {0}; //存储地图数据
+int myside = -1;
+int rounds = -1;//回合数
 int px[4] = { 0,1,0,-1 };//上、右、下、左，对应行动的0 1 2 3(行进) 和 4 5 6 7(射击)
 int py[4] = { -1,0,1,0 };
 /*全局变量定义结束*/
-#define not_DEBUG
+//////////////////
+const bool MANUAL_INPUT = true;//打开/关闭手动输入
+#ifndef _BOTZONE_ONLINE //在botzone上不会以调试模式运行
+#define DEBUG //打开/关闭调试输出
+#endif
+//////////////////
 struct point {
-	int x, y;
-	double cost;
+	int x = -1, y = -1;
+	double cost = INF;
 	friend bool operator <(point a, point b)//不要在意这个奇妙的比较
 	{
 		return a.cost > b.cost;
@@ -36,16 +41,16 @@ bool comp_point(point a, point b)
 
 struct Distances//搜索以后上下左右四个方向最短时间
 {
-	double d[4];
+	double d[4] = {0};
 };
 
 class Tank {
 public:
-	int x, y;//位置x y
-	bool in_bush = 0;//在树丛中
+	int x = -1, y = -1;//位置x y
+	bool in_bush = false;//在树丛中
 	int shoot_cnt = 1;//是否可以发射炮弹,以及连续几个回合没有发射
 	int dead = 0;//awsl
-	bool possible[9][9];//可能处于的位置，仅当敌方存在于树林中时有效
+	bool possible[9][9] = {false};//可能处于的位置，仅当敌方存在于树林中时有效
 	void cal_pos()//当in_bush为1时，计算可能位置，为0时清空possible数组
 	{
 		if (in_bush == 0)
@@ -58,7 +63,7 @@ public:
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				if (possible[i][j] == 1 and !!state[i][j] & forest)
+				if (possible[i][j] == 1 and state[i][j]!=0 & forest)
 				{
 					int xx, yy;
 					for (int k = 0; k < 4; k++)
@@ -73,8 +78,6 @@ public:
 				}
 			}
 		}
-
-		return;
 	}
 };
 Tank  self_tank[2];
@@ -95,7 +98,6 @@ bool in_range(int self_id, int enemy_id)//自己和敌方两辆坦克是否面�
 {
 	if (self_tank[self_id].x != enemy_tank[enemy_id].x and self_tank[self_id].y != enemy_tank[enemy_id].y)//不在同一直线上
 		return false;
-
 	if (self_tank[self_id].x == enemy_tank[enemy_id].x)
 	{
 		int x = self_tank[self_id].x;
@@ -117,7 +119,6 @@ bool in_range(int self_id, int enemy_id)//自己和敌方两辆坦克是否面�
 		}
 		return true;
 	}
-
 	else if (self_tank[self_id].y == enemy_tank[enemy_id].y)
 	{
 		//大规模代码复用
@@ -140,6 +141,7 @@ bool in_range(int self_id, int enemy_id)//自己和敌方两辆坦克是否面�
 		}
 		return true;
 	}
+	else return false;
 }
 
 bool in_range(int enemy_id)//重载后的函数，判断基地是否会被打中，不管这时敌人有没有炮弹都很危险
@@ -189,6 +191,7 @@ bool in_range(int enemy_id)//重载后的函数，判断基地是否会被打中
 		}
 		return true;
 	}
+	return false;
 }
 
 double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距离
@@ -200,20 +203,23 @@ double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距�
 		tank = &self_tank[id];
 	else
 		tank = &enemy_tank[id - 2];
-	
-	if (DebugMode) cout << "x= " << x << " y= " << y << " id= " << id << endl;
+#ifdef DEBUG
+	cout << "[get_distance] x= " << x << " y= " << y << " id= " << id << endl;
+#endif
 	bool explored[9][9], frontier[9][9];
-	double min_step = 10000000;
+	double min_step = INF;
 	memset(explored, 0, sizeof(explored));
 	memset(frontier, 0, sizeof(frontier));
-	if(DebugMode) cout << "self_tank y=" << tank->y << " x=" << tank->x << endl;
-	explored[tank->y][tank->x] = 1;
+#ifdef DEBUG
+	cout << "[get_distance] self_tank y=" << tank->y << " x=" << tank->x << endl;
+#endif
+	explored[tank->y][tank->x] = true;
 	priority_queue<point> q;
 	point start;
-	start.x = x, start.y = y; 
-	if (!in_map(x, y)) return 10000000;
-	if (state[y][x] & steel) return 10000000;
-	if (state[y][x] & water and y != 8 * (1 - myside)) return 10000000;
+	start.x = x, start.y = y;
+	if (!in_map(x, y)) return INF;
+	if (state[y][x] & steel) return INF;
+	if (state[y][x] & water and y != 8 * (1 - myside)) return INF;
 	if (state[y][x] == 0 or state[y][x] & forest) start.cost = 1;
 	if (state[y][x] & brick)
 	{
@@ -221,9 +227,9 @@ double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距�
 		else start.cost = 2;
 	}
 	q.push(start);
-	explored[y][x] = 1, frontier[y][x] = 1;
+	explored[y][x] = true, frontier[y][x] = true;
 	while (!q.empty())
-	{   
+	{
 		point temp = q.top();
 		if (frontier[temp.y][temp.x] == 0)//如果不在探索集中，将其移除
 		{
@@ -237,7 +243,7 @@ double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距�
 			if (temp.cost < min_step) min_step = temp.cost;
 		}
 		q.pop();
-		frontier[temp.y][temp.x] = 0;
+		frontier[temp.y][temp.x] = false;
 		for (int i = 0; i < 4; i++)
 		{
 			point next;
@@ -265,7 +271,7 @@ double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距�
 			if (state[next.y][next.x] & brick) next.cost = temp.cost + 2.1;
 			else  next.cost = temp.cost + 1;
 			q.push(next);
-		//	if(DebugMode) 
+		//	if(DebugMode)
 			explored[next.y][next.x] = true;
 			frontier[next.y][next.x] = true;
 		//	cout << "		in: " << next.y << ' ' << next.x << ' ' << next.cost << endl;
@@ -288,10 +294,12 @@ Distances route_search(int id)//上下左右四个方向走向敌方基地所需
 	Distances temp;
 	for (int i = 0; i < 4; i++)
 	{
-		temp.d[i] = 10000000;
+		temp.d[i] = INF;
 		int xx = self_tank[id].x + px[i];
 		int yy = self_tank[id].y + py[i];
-		if(DebugMode) cout << "xx= " << xx << " yy= " << yy << endl;
+#ifdef DEBUG
+		cout << "[route_search] xx= " << xx << " yy= " << yy << endl;
+#endif
 		if (!in_map(xx, yy)) continue;
 		temp.d[i] = get_distance(xx, yy, id);
 	};
@@ -356,7 +364,7 @@ double evaluate()
 bool valid(int id, int action)//最粗略的检查
 {
 #ifdef DEBUG
-	cout << "action: " << id << ' ' << action << endl << endl;
+	cout << "[valid] action: " << id << ' ' << action << endl;
 #endif // DEBUG
 
 	if (self_tank[id].dead and action != -1) return false;
@@ -375,26 +383,28 @@ bool valid(int id, int action)//最粗略的检查
 	int yy = self_tank[id].y + py[action];
 	if (!ok(xx, yy))
 	{
-		//cout << yy << ' ' << xx << ' ' << state[yy][xx] << endl;
+#ifdef DEBUG
+		cout << "[valid] yy = " << yy << " xx = "<< xx << " state = " << (int)state[yy][xx] << endl;
+#endif
 		return false;
 	}
-	/*cout << "next location:" << yy << ' ' << xx << endl;
-	for (int i = 0; i < 2; i++)
-	{
-		cout << "enemy" << i << ": " << enemy_tank[i].y << ' ' << enemy_tank[i].x << endl;
-		if (enemy_tank[i].x >= 0)//can not step into a tank's block (although tanks can overlap inadventently)
-		{
-			if ((xx - enemy_tank[i].x == 0) && (yy - enemy_tank[i].y == 0))
-			{
-				return false;
-			}
-		}
-		if (self_tank[i].x >= 0)
-		{
-			if ((xx - self_tank[i].x == 0) && (yy - self_tank[i].y == 0))
-				return false;
-		}
-	}*/ //因为有了tank = 16所以这一部分大概不用再留着了
+//	cout << "next location:" << yy << ' ' << xx << endl;
+//	for (int i = 0; i < 2; i++)
+//	{
+//		cout << "enemy" << i << ": " << enemy_tank[i].y << ' ' << enemy_tank[i].x << endl;
+//		if (enemy_tank[i].x >= 0)//can not step into a tank's block (although tanks can overlap inadventently)
+//		{
+//			if ((xx - enemy_tank[i].x == 0) && (yy - enemy_tank[i].y == 0))
+//			{
+//				return false;
+//			}
+//		}
+//		if (self_tank[i].x >= 0)
+//		{
+//			if ((xx - self_tank[i].x == 0) && (yy - self_tank[i].y == 0))
+//				return false;
+//		}
+//	} //因为有了tank = 16所以这一部分大概不用再留着了
 	return true;
 }
 
@@ -415,7 +425,7 @@ bool enemy_near(int x, int y, int action)//判断敌人是否在炮弹轨迹旁 
 
 bool cut(int id, int action)//手动剪枝策略 true不行 false可以
 {
-	int state_back[9][9];//备份地图
+	int8_t state_back[9][9];//备份地图
 	memcpy(state_back, state, sizeof(state));
 	if (action >= 0 and action < 4)//判断行动后有没有可能被打
 	{
@@ -437,7 +447,7 @@ bool cut(int id, int action)//手动剪枝策略 true不行 false可以
 	}
 	if (action >= 4)
 	{
-		
+
 		if (in_range(id, 0) or in_range(id, 1))//改动，限制了发射炮弹的方向，如果已经进入射程只能朝敌人打
 		{
 			//cout << "IN_RANGE!!!!!!!" << endl;
@@ -461,12 +471,12 @@ bool cut(int id, int action)//手动剪枝策略 true不行 false可以
 		while (in_map(x, y))
 		{
 #ifdef DEBUG
-			cout << id << ' ' << action << endl;
-			cout << "y:" << y << " x:" << x << ' ';
-			cout << "state:"<< state[y][x] << endl;
+			cout << "[cut] id = " << id << ' ' << action << ' ';
+			cout << " y = " << y << " x = " << x << ' ';
+			cout << "state = "<< (int)state[y][x] << endl;
 #endif // DEBUG
 
-			
+
 			if ( (state[y][x] & steel) or (y == myside * 8 and x == 4) or (y == self_tank[1 - id].y  and x == self_tank[1 - id].x) )//打中钢块或者自己
 				return true;
 			if (enemy_near(x, y, action)) return false;//预判可以打到敌人
@@ -514,17 +524,17 @@ point move_generator()//用point装一下两个行动 原本的路径cost正好�
 	point actions;
 	for (int i = 1; i < 9; i++)
 	{
-		if (!valid(0, i - 1)) act0[i] = 1;
-		if (!valid(1, i - 1)) act1[i] = 1;
+		if (!valid(0, i - 1)) act0[i] = true;
+		if (!valid(1, i - 1)) act1[i] = true;
 	}
 #ifdef DEBUG
-	cout << "act0: ";
+	cout << "[move_generator] act0: ";
 	for (int i = 0; i < 9; i++)
 	{
 		cout << i - 1 << ":" << act0[i] << ' ';
 	}
 	cout << endl;
-	cout << "act1: ";
+	cout << "[move_generator] act1: ";
 	for (int i = 0; i < 9; i++)
 	{
 		cout << i - 1 << ":" << act1[i] << ' ';
@@ -533,10 +543,10 @@ point move_generator()//用point装一下两个行动 原本的路径cost正好�
 #endif // DEBUG
 	for (int i = 1; i < 9; i++)
 	{
-		if (!act0[i] and cut(0, i - 1)) act0[i] = 1;
-		if (!act1[i] and cut(1, i - 1)) act1[i] = 1;
+		if (!act0[i] and cut(0, i - 1)) act0[i] = true;
+		if (!act1[i] and cut(1, i - 1)) act1[i] = true;
 	}
-	
+
 	int act[2];
 	act[0] = act[1] = -1;
 	for (int i = 0; i < 2; i++)
@@ -554,14 +564,14 @@ point move_generator()//用point装一下两个行动 原本的路径cost正好�
 					temp = dis.d[j];
 					dis.d[j] = dis.d[k];
 					dis.d[k] = temp;
-					temp = order[j];
+					int temp2 = order[j];
 					order[j] = order[k];
-					order[k] = temp;
+					order[k] = temp2;
 				}
 			}
 		}
 #ifdef DEBUG
-		cout << "order" << i << ": ";
+		cout << "[move_generator] order" << i << ": ";
 		for (int j = 0; j < 4; j++)
 		{
 			cout << order[j] << ' ';
@@ -603,13 +613,13 @@ point move_generator()//用point装一下两个行动 原本的路径cost正好�
 		}
 	}
 #ifdef DEBUG
-	cout << "act0: ";
+	cout << "[move_generator] act0: ";
 	for (int i = 0; i < 9; i++)
 	{
 		cout << i - 1 << ":" << act0[i] << ' ';
 	}
 	cout << endl;
-	cout << "act1: ";
+	cout << "[move_generator] act1: ";
 	for (int i = 0; i < 9; i++)
 	{
 		cout << i - 1 << ":" << act1[i] << ' ';
@@ -636,8 +646,9 @@ int main()
 #ifdef _BOTZONE_ONLINE
 	reader.parse(cin, all);
 #else
-	string s = string("{\"requests\":[{\"brickfield\":[21167146,4937360,44169748],\"forestfield\":[12320768,127926319,488],\"mySide\":1,\"steelfield\":[512,43008,131072],\"waterfield\":[33554432,1048640,2]},{\"action\":[6,6],\"destroyed_blocks\":[2,1,2,7,6,1,6,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,6,0]},{\"action\":[2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,6,1]},{\"action\":[2,6],\"destroyed_blocks\":[2,6,6,2],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,6,1]},{\"action\":[-2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,6,2]},{\"action\":[-2,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[3,4,4,5,5,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,-2,-2]},{\"action\":[4,-2],\"destroyed_blocks\":[1,5,3,1,5,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,5,4]},{\"action\":[6,6],\"destroyed_blocks\":[3,0,3,7,4,6,5,8],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,5,4]},{\"action\":[2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[4,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroye") + string("d_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,7],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,7],\"final_enemy_positions\":[-1,-1,5,7]},{\"action\":[-1,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,3],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]}],\"responses\":[[4,4,[\"tank\",0,0,14.4,10000,1,17.5,14.4,2,10000000,14.4,3,15.5,14.4,\"tank\",1,0,15.5,10000,1,15.5,15.5,2,10000000,15.5,3,17.5,15.5]],[0,0,[\"tank\",0,0,14.4,10000,1,19.5,14.4,2,10000000,14.4,3,17.5,14.4,\"tank\",1,0,15.5,10000,1,17.5,15.5,2,10000000,15.5,3,17.5,15.5]],[0,4,[\"tank\",0,0,13.4,10000,1,15.4,13.4,2,16.5,13.4,3,13.4,13.4,\"tank\",1,0,13.4,10000,1,13.4,13.4,2,16.5,13.4,3,16.3,13.4]],[0,0,[\"tank\",0,0,12.4,10000,1,14.4,12.4,2,15.5,12.4,3,12.4,12.4,\"tank\",1,0,13.4,10000,1,15.4,13.4,2,19.6,13.4,3,17.4,13.4]],[3,1,[\"tank\",0,0,10000000,10000,1,15.4,10000,2,13.4,15.4,3,11.4,13.4,\"tank\",1,0,10000000,10000,1,12.4,10000,2,15.5,12.4,3,10000000,12.4]],[7,0,[\"tank\",0,0,10.3,10000,1,15.3,10.3,2,13.3,10.3,3,11.3,10.3,\"tank\",1,0,10.3,10000,1,12.") + string("3,10.3,2,15.4,10.3,3,17.4,10.3]],[3,0,[\"tank\",0,0,9.299999999999999,10000,1,15.3,9.299999999999999,2,13.3,9.299999999999999,3,10.2,9.299999999999999,\"tank\",1,0,8.2,10000,1,11.3,8.2,2,14.4,8.2,3,10000000,8.2]],[7,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,12.3,10.3,3,10.3,10.3,\"tank\",1,0,8.299999999999999,10000,1,10000000,8.299999999999999,2,12.3,8.299999999999999,3,10000000,8.299999999999999]],[-1,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,13.2,10.3,3,9.2,10.3,\"tank\",1,0,7.199999999999999,10000,1,10000000,7.199999999999999,2,12.3,7.199999999999999,3,10000000,7.199999999999999]],[6,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,11.2,10.3,3,9.2,10.3,\"tank\",1,0,7.199999999999999,10000,1,10000000,7.199999999999999,2,12.3,7.199999999999999,3,10000000,7.199999999999999]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[6,4,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,4,[\"tank\",0,0,10.1,10000,1,12.1,10.1,2,14.2,10.1,3,11.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6") + string(".1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[3,0,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[-1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[-1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[4,4,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,9.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[4,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[-1,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]]]}");
-
+	string s;
+    if(MANUAL_INPUT) cin >> s;
+	else s = string("{\"requests\":[{\"brickfield\":[21167146,4937360,44169748],\"forestfield\":[12320768,127926319,488],\"mySide\":1,\"steelfield\":[512,43008,131072],\"waterfield\":[33554432,1048640,2]},{\"action\":[6,6],\"destroyed_blocks\":[2,1,2,7,6,1,6,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,6,0]},{\"action\":[2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,6,1]},{\"action\":[2,6],\"destroyed_blocks\":[2,6,6,2],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,6,1]},{\"action\":[-2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,6,2]},{\"action\":[-2,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[3,4,4,5,5,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,-2,-2]},{\"action\":[4,-2],\"destroyed_blocks\":[1,5,3,1,5,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,5,4]},{\"action\":[6,6],\"destroyed_blocks\":[3,0,3,7,4,6,5,8],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,4,5,4]},{\"action\":[2,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[4,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[-2,-2,-2,-2]},{\"action\":[-2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroye") + string("d_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,7,5,7]},{\"action\":[-1,7],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,7],\"final_enemy_positions\":[-1,-1,5,7]},{\"action\":[-1,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,3],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,3],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,3,7]},{\"action\":[-1,1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,4,7]}],\"responses\":[[4,4,[\"tank\",0,0,14.4,10000,1,17.5,14.4,2,10000000,14.4,3,15.5,14.4,\"tank\",1,0,15.5,10000,1,15.5,15.5,2,10000000,15.5,3,17.5,15.5]],[0,0,[\"tank\",0,0,14.4,10000,1,19.5,14.4,2,10000000,14.4,3,17.5,14.4,\"tank\",1,0,15.5,10000,1,17.5,15.5,2,10000000,15.5,3,17.5,15.5]],[0,4,[\"tank\",0,0,13.4,10000,1,15.4,13.4,2,16.5,13.4,3,13.4,13.4,\"tank\",1,0,13.4,10000,1,13.4,13.4,2,16.5,13.4,3,16.3,13.4]],[0,0,[\"tank\",0,0,12.4,10000,1,14.4,12.4,2,15.5,12.4,3,12.4,12.4,\"tank\",1,0,13.4,10000,1,15.4,13.4,2,19.6,13.4,3,17.4,13.4]],[3,1,[\"tank\",0,0,10000000,10000,1,15.4,10000,2,13.4,15.4,3,11.4,13.4,\"tank\",1,0,10000000,10000,1,12.4,10000,2,15.5,12.4,3,10000000,12.4]],[7,0,[\"tank\",0,0,10.3,10000,1,15.3,10.3,2,13.3,10.3,3,11.3,10.3,\"tank\",1,0,10.3,10000,1,12.") + string("3,10.3,2,15.4,10.3,3,17.4,10.3]],[3,0,[\"tank\",0,0,9.299999999999999,10000,1,15.3,9.299999999999999,2,13.3,9.299999999999999,3,10.2,9.299999999999999,\"tank\",1,0,8.2,10000,1,11.3,8.2,2,14.4,8.2,3,10000000,8.2]],[7,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,12.3,10.3,3,10.3,10.3,\"tank\",1,0,8.299999999999999,10000,1,10000000,8.299999999999999,2,12.3,8.299999999999999,3,10000000,8.299999999999999]],[-1,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,13.2,10.3,3,9.2,10.3,\"tank\",1,0,7.199999999999999,10000,1,10000000,7.199999999999999,2,12.3,7.199999999999999,3,10000000,7.199999999999999]],[6,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,11.2,10.3,3,9.2,10.3,\"tank\",1,0,7.199999999999999,10000,1,10000000,7.199999999999999,2,12.3,7.199999999999999,3,10000000,7.199999999999999]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[6,4,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,4,[\"tank\",0,0,10.1,10000,1,12.1,10.1,2,14.2,10.1,3,11.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[2,4,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6") + string(".1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[3,0,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,6.1,10000,1,10000000,6.1,2,12.3,6.1,3,10000000,6.1]],[-1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[-1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[4,4,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[1,-1,[\"tank\",0,0,7.1,10000,1,11.3,7.1,2,13.3,7.1,3,10000000,7.1,\"tank\",1,0,5.1,10000,1,9.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[0,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[2,-1,[\"tank\",0,0,10000000,10000,1,10.3,10000,2,10.1,10.3,3,8.1,10.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[4,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]],[-1,-1,[\"tank\",0,0,9.1,10000,1,11.1,9.1,2,11.1,9.1,3,9.1,9.1,\"tank\",1,0,5.1,10000,1,8.299999999999999,5.1,2,13.3,5.1,3,7.1,5.1]]]}");
 	reader.parse(s, all);
 #endif
 
@@ -719,7 +730,7 @@ int main()
 				seed += enemy_tank[j].y, seed ^= enemy_tank[j].y;
 				//enemy_position[j] = input[i]["final_enemy_positions"][j].asInt(), seed += enemy_position[j], seed ^= enemy_position[j];
 			}
-				
+
 			for (int j = 0; j < input[i]["destroyed_blocks"].size(); j += 2)//可以根据这个推理敌方位置,暂时还没做
 			{
 				int x = input[i]["destroyed_blocks"][j].asInt();
@@ -729,7 +740,7 @@ int main()
 			}
 		}
 	}
-	
+
 	for (int i = 0; i < 2; i++)//把tank所在位置更新为16
 	{
 		state[self_tank[i].y][self_tank[i].x] = 16;
@@ -737,7 +748,7 @@ int main()
 		{
 			state[enemy_tank[i].y][enemy_tank[i].x] = 16;
 		}
-	} 
+	}
 
 	//cout << "enemy " << enemy_tank[0].y << ' ' << enemy_tank[0].x << endl << enemy_tank[1].y << ' ' << enemy_tank[1].x << endl;
 
@@ -776,12 +787,12 @@ int main()
 			}
 		}
 	}
-	
+
 
 	output = Json::Value(Json::arrayValue);
 	debug = Json::Value(Json::arrayValue);
 	//srand(self_tank[0].x ^ self_tank[1].x ^ enemy_tank[0].y ^ enemy_tank[1].y ^ seed ^ 565646411);
-	
+
 	point actions;
 	actions = move_generator();
 	for (int i = 0; i < 2; i++)
@@ -793,7 +804,7 @@ int main()
 		double min = 10000;
 		for (int j = 0; j < 4; j++)
 		{
-		//	cout << dis.d[j] << ' ' << min << endl;
+			//	cout << dis.d[j] << ' ' << min << endl;
 			debug.append(j), debug.append(dis.d[j]), debug.append(min);
 			if (dis.d[j] < min)
 			{
@@ -802,19 +813,17 @@ int main()
 			}
 		}
 		//cout << "d: " << direction << endl;
-	/*	int xx = self_tank[i].x + px[direction];
-		int yy = self_tank[i].y + py[direction];
-		if (state[yy][xx] & brick)
-		{
-			if (self_tank[i].shoot_cnt > 0) action = direction + 4;
-			else action = -1;
-		}
-		else action = direction;
-		if (!valid(i, action)) action = -1;
-		output.append(action);*/
+		/*	int xx = self_tank[i].x + px[direction];
+            int yy = self_tank[i].y + py[direction];
+            if (state[yy][xx] & brick)
+            {
+                if (self_tank[i].shoot_cnt > 0) action = direction + 4;
+                else action = -1;
+            }
+            else action = direction;
+            if (!valid(i, action)) action = -1;
+            output.append(action);*/
 	}
-	
-	
 	output.append(actions.x), output.append(actions.y);output.append(debug);
 	Json::FastWriter writer;
 	cout << writer.write(output);
@@ -822,15 +831,3 @@ int main()
 //	cout << "wrong?" << endl;
 	return 0;
 }
-
-
-// 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
-// 调试程序: F5 或调试 >“开始调试”菜单
-
-// 入门提示: 
-//   1. 使用解决方案资源管理器窗口添加/管理文件
-//   2. 使用团队资源管理器窗口连接到源代码管理
-//   3. 使用输出窗口查看生成输出和其他消息
-//   4. 使用错误列表窗口查看错误
-//   5. 转到“项目”>“添加新项”以创建新的代码文件，或转到“项目”>“添加现有项”以将现有代码文件添加到项目
-//   6. 将来，若要再次打开此项目，请转到“文件”>“打开”>“项目”并选择 .sln 文件
