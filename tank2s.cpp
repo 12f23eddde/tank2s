@@ -1,27 +1,24 @@
-﻿
-#include "pch.h"
 #include <stack>
 #include <set>
 #include <string>
 #include <iostream>
 #include <ctime>
+#include <cmath>
 #include <cstring>
 #include <queue>
 #include <vector>
-#include "json/json.h"
-
-#define DEBUG
+#include "jsoncpp/json.h"
 
 using namespace std;
 const int none = 0, brick = 1, forest = 2, steel = 4, water = 8, tank = 16;
-const bool DebugMode = true;
+const bool DebugMode = 0;
 int state[9][9];
 int myside;
 int rounds;//回合数
 int px[4] = { 0,1,0,-1 };//上、右、下、左，对应行动的0 1 2 3(行进) 和 4 5 6 7(射击)
 int py[4] = { -1,0,1,0 };
 /*全局变量定义结束*/
-
+#define not_DEBUG
 struct point {
 	int x, y;
 	double cost;
@@ -195,29 +192,37 @@ bool in_range(int enemy_id)//重载后的函数，判断基地是否会被打中
 
 double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距离
 {
+	//增加新功能：计算敌方距离，敌方坦克用ID 2 3代表
+	//不确定有没有bug
+	Tank *tank;
+	if (id < 2)
+		tank = &self_tank[id];
+	else
+		tank = &enemy_tank[id - 2];
+	
 	if (DebugMode) cout << "x= " << x << " y= " << y << " id= " << id << endl;
 	bool explored[9][9], frontier[9][9];
 	double min_step = 10000000;
 	memset(explored, 0, sizeof(explored));
 	memset(frontier, 0, sizeof(frontier));
-	if(DebugMode) cout << "self_tank y=" << self_tank[id].y << " x=" << self_tank[id].x << endl;
-	explored[self_tank[id].y][self_tank[id].x] = 1;
+	if(DebugMode) cout << "self_tank y=" << tank->y << " x=" << tank->x << endl;
+	explored[tank->y][tank->x] = 1;
 	priority_queue<point> q;
 	point start;
-	start.x = x, start.y = y;
+	start.x = x, start.y = y; 
 	if (!in_map(x, y)) return 10000000;
 	if (state[y][x] & steel) return 10000000;
 	if (state[y][x] & water and y != 8 * (1 - myside)) return 10000000;
 	if (state[y][x] == 0 or state[y][x] & forest) start.cost = 1;
 	if (state[y][x] & brick)
 	{
-		if (self_tank[id].shoot_cnt == 0) start.cost = 3;
+		if (tank->shoot_cnt == 0) start.cost = 3;
 		else start.cost = 2;
 	}
 	q.push(start);
 	explored[y][x] = 1, frontier[y][x] = 1;
 	while (!q.empty())
-	{
+	{   
 		point temp = q.top();
 		if (frontier[temp.y][temp.x] == 0)//如果不在探索集中，将其移除
 		{
@@ -247,18 +252,25 @@ double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距�
 			if ((state[next.y][next.x] & steel) or (state[next.y][next.x] & water)) continue;
 			for (int j = 0; j < 2; j++)
 			{
-				if (next.y == enemy_tank[j].y and next.x == enemy_tank[j].x) next.cost = temp.cost + 3;
+				if (id < 2)
+				{
+					if (next.y == enemy_tank[j].y and next.x == enemy_tank[j].x) next.cost = temp.cost + 3;
+				}
+				else
+				{
+					if (next.y == self_tank[j].y and next.x == self_tank[j].x) next.cost = temp.cost + 3;
+				}
 			}
 			if (state[next.y][next.x] & brick) next.cost = temp.cost + 2.1;
 			else  next.cost = temp.cost + 1;
 			q.push(next);
-			if(DebugMode) 
+		//	if(DebugMode) 
 			explored[next.y][next.x] = true;
 			frontier[next.y][next.x] = true;
-			cout << "		in: " << next.y << ' ' << next.x << ' ' << next.cost << endl;
+		//	cout << "		in: " << next.y << ' ' << next.x << ' ' << next.cost << endl;
 		}
 	}
-	cout << min_step << endl;
+/*	cout << min_step << endl;
 	for (int i = 0; i < 9; i++)
 	{
 		for (int j = 0; j < 9; j++)
@@ -266,7 +278,7 @@ double get_distance(int x, int y, int id)//搜索攻击地方基地的最短距�
 			cout << explored[i][j];
 		}
 		cout << endl;
-	}
+	}*/
 	return min_step;
 }
 
@@ -284,11 +296,66 @@ Distances route_search(int id)//上下左右四个方向走向敌方基地所需
 	};
 	return temp;
 }
-	
+
+double evaluate()
+{
+	//增加了估值函数
+	double eval_self = 0, eval_enemy = 0;
+	if (!self_tank[0].dead and !self_tank[1].dead)
+	{
+		double a, b;
+		a = get_distance(self_tank[0].x, self_tank[0].y, 0);
+		b = get_distance(self_tank[1].x, self_tank[1].y, 1);
+		if (a < b)
+			eval_self = 2 / a + 1 / b;
+		else
+			eval_self = 1 / b + 2 / b;//若都存活，估值为离得近的坦克的距离的倒数的两倍 加上离得远的坦克
+	}
+	else
+	{
+		if (self_tank[0].dead)
+		{
+			eval_self = 1/get_distance(self_tank[1].x, self_tank[1].y, 1);
+		}
+		if (self_tank[1].dead)
+		{
+			eval_self = 1/get_distance(self_tank[0].x, self_tank[0].y, 0);
+		}
+		else
+			eval_self = 0;
+	}
+
+	if (!enemy_tank[0].dead and !enemy_tank[1].dead)
+	{
+		double a, b;
+		a = get_distance(enemy_tank[0].x, enemy_tank[0].y, 2);
+		b = get_distance(enemy_tank[1].x, enemy_tank[1].y, 3);
+		if (a < b)
+			eval_enemy = 2 / a + 1 / b;
+		else
+			eval_enemy = 1 / b + 2 / b;//若都存活，估值为离得近的坦克的距离加上离得远的的两倍
+	}
+	else
+	{
+		if (enemy_tank[0].dead)
+		{
+			eval_enemy = 1/get_distance(enemy_tank[1].x, enemy_tank[1].y, 1);
+		}
+		if (enemy_tank[1].dead)
+		{
+			eval_enemy = 1/get_distance(enemy_tank[0].x, enemy_tank[0].y, 0);
+		}
+		else
+			eval_enemy = 0;
+	}
+	//cout << eval_self << ' ' << eval_enemy << endl;
+	return eval_self - eval_enemy;
+}
+
 bool valid(int id, int action)//最粗略的检查
 {
 #ifdef DEBUG
-	cout << endl << id << ' ' << action << endl << endl;
+	cout << "action: " << id << ' ' << action << endl << endl;
 #endif // DEBUG
 
 	if (self_tank[id].dead and action != -1) return false;
@@ -297,10 +364,19 @@ bool valid(int id, int action)//最粗略的检查
 	//	if (self_tank[id].x < 4 && action == 5)return false;
 	//	if (self_tank[id].x > 4 && action == 7)return false;// 这个比较值得商榷，先注释掉
 	}
-	if (action == -1 || action >= 4)return true;
+	if (action == -1)return true;
+	if (action >= 4)
+	{
+		if (self_tank[id].shoot_cnt > 0) return true;
+		else return false;
+	}
 	int xx = self_tank[id].x + px[action];
 	int yy = self_tank[id].y + py[action];
-	if (!ok(xx, yy))return false;
+	if (!ok(xx, yy))
+	{
+		//cout << yy << ' ' << xx << ' ' << state[yy][xx] << endl;
+		return false;
+	}
 	/*cout << "next location:" << yy << ' ' << xx << endl;
 	for (int i = 0; i < 2; i++)
 	{
@@ -336,7 +412,7 @@ bool enemy_near(int x, int y, int action)//判断敌人是否在炮弹轨迹旁 
 	return false;
 }
 
-bool cut(int id, int action)//手动剪枝策略
+bool cut(int id, int action)//手动剪枝策略 true不行 false可以
 {
 	int state_back[9][9];//备份地图
 	memcpy(state_back, state, sizeof(state));
@@ -349,47 +425,75 @@ bool cut(int id, int action)//手动剪枝策略
 		if ((in_range(id, 0) and enemy_tank[0].shoot_cnt > 0) or (in_range(id, 1) and enemy_tank[1].shoot_cnt > 0))//敌人有炮弹，没有炮弹可以趁机冲过去
 		{
 			self_tank[id].x = x, self_tank[id].y = y;
-			return false;
+			return true;
 		}
 		if (in_range(0)  or in_range(1))//不管敌人有没有炮弹都很牙白
 		{
 			self_tank[id].x = x, self_tank[id].y = y;
-			return false;
+			return true;
 		}
+		self_tank[id].x = x, self_tank[id].y = y;
 	}
 	if (action >= 4)
 	{
-		if (in_range(id, 0) or in_range(id, 1)) return true;
+		
+		if (in_range(id, 0) or in_range(id, 1))//改动，限制了发射炮弹的方向，如果已经进入射程只能朝敌人打
+		{
+			//cout << "inrange bug?" << endl;
+			if (in_range(id, 0))
+			{
+				if ((enemy_tank[0].x - self_tank[id].x) == abs(enemy_tank[0].x - self_tank[id].x) * px[action - 4]
+					and (enemy_tank[0].x - self_tank[id].x) == abs(enemy_tank[0].x - self_tank[id].x) * px[action - 4])
+					return false;
+				else return true;
+			}
+			else
+			{
+				if ((enemy_tank[1].x - self_tank[id].x) == abs(enemy_tank[1].x - self_tank[id].x) * px[action - 4]
+					and (enemy_tank[1].x - self_tank[id].x) == abs(enemy_tank[1].x - self_tank[id].x) * px[action - 4])
+					return false;
+				else return true;
+			}
+		}
 		//可以打到敌人
 		int x = self_tank[id].x + px[action - 4], y = self_tank[id].y + py[action - 4];
 		while (in_map(x, y))
 		{
+#ifdef DEBUG
+			cout << id << ' ' << action << endl;
+			cout << "y:" << y << " x:" << x << ' ';
+			cout << "state:"<< state[y][x] << endl;
+#endif // DEBUG
+
+			
 			if ( (state[y][x] & steel) or (y == myside * 8 and x == 4) or (y == self_tank[1 - id].y  and x == self_tank[1 - id].x) )//打中钢块或者自己
-				return false;
-			if (enemy_near(x, y, action)) return true;//预判可以打到敌人
+				return true;
+			if (enemy_near(x, y, action)) return false;//预判可以打到敌人
 			if (state[y][x] & brick)//如果是砖块
 			{
 				state[y][x] = 0;
 				if ((in_range(id, 0) and enemy_tank[0].shoot_cnt > 0) or (in_range(id, 1) and enemy_tank[1].shoot_cnt > 0))//砖块没了直接白给
 				{
 					memcpy(state, state_back, sizeof(state));//复原地图
-					return false;
+					return true;
 				}
 				if (in_range(0) or in_range(1))//敌人到老家门口
 				{
 					memcpy(state, state_back, sizeof(state));//复原地图
-					return false;
+					return true;
 				}
+				else
+					return false;//只是打到了砖块
 			}
 			x += px[action - 4], y += py[action - 4];
 		}//如果结束，说明什么都不会打到
 		memcpy(state, state_back, sizeof(state));//复原地图
-		return false;
+		return true;
 	}
-	return true;//以上情况如果都没有发生那大概可以？
+	return false;//以上情况如果都没有发生那大概可以？
 }
 
-void move_generator()//用point装一下两个行动 原本的路径cost正好当局面估值（手动滑稽
+point move_generator()//用point装一下两个行动 原本的路径cost正好当局面估值（手动滑稽
 {
 	//原则上坦克两个一组进行搜索，但也会考虑别的
 	//即己方0 对方1 和 己方1 对方0 因为分布在中轴线同一侧
@@ -401,17 +505,16 @@ void move_generator()//用point装一下两个行动 原本的路径cost正好�
 	5.不合法行动（我觉得这个可能不用说）*/
 	//以上都是通过自己的行动就可以剪掉的
 	//-1作为优先级最低的行动在某些特殊情况下采取
+	//另外可能出现无论如何死路一条的情况
+	//这种情况下就尽量打一个砖块或者为另一辆争取时间
+	//把-1改为无论如何都可行了
 	bool act0[9], act1[9];//tank0 1的行动
 	memset(act0, 0, sizeof(act0)), memset(act1, 0, sizeof(act1));//0代表可行，1代表不可行
-	for (int i = 0; i < 9; i++)
+	point actions;
+	for (int i = 1; i < 9; i++)
 	{
 		if (!valid(0, i - 1)) act0[i] = 1;
 		if (!valid(1, i - 1)) act1[i] = 1;
-	}
-	for (int i = 0; i < 9; i++)
-	{
-		if (act0[i] and !cut(0, i - 1)) act0[i] = 1;
-		if (act1[i] and !cut(1, i - 1)) act1[i] = 1;
 	}
 #ifdef DEBUG
 	cout << "act0: ";
@@ -427,8 +530,94 @@ void move_generator()//用point装一下两个行动 原本的路径cost正好�
 	}
 	cout << endl;
 #endif // DEBUG
-
+	for (int i = 1; i < 9; i++)
+	{
+		if (!act0[i] and cut(0, i - 1)) act0[i] = 1;
+		if (!act1[i] and cut(1, i - 1)) act1[i] = 1;
+	}
 	
+	int act[2];
+	act[0] = act[1] = -1;
+	for (int i = 0; i < 2; i++)
+	{
+		Distances dis;
+		dis = route_search(i);
+		int order[4] = {0,1,2,3};
+		double temp;
+		for (int j = 0; j < 4; j++)
+		{
+			for (int k = j; k < 4; k++)
+			{
+				if (dis.d[j] > dis.d[k])
+				{
+					temp = dis.d[j];
+					dis.d[j] = dis.d[k];
+					dis.d[k] = temp;
+					temp = order[j];
+					order[j] = order[k];
+					order[k] = temp;
+				}
+			}
+		}
+#ifdef DEBUG
+		cout << "order" << i << ": ";
+		for (int j = 0; j < 4; j++)
+		{
+			cout << order[j] << ' ';
+		}
+		cout << endl;
+#endif // DEBUG
+
+		//cout << "d: " << direction << endl;
+		int xx;
+		int yy;
+		for (int j = 0; j < 4; j++)
+		{
+			if (i == 0)
+			{
+				if (!act0[order[j] + 1])
+				{
+					act[0] = order[j];
+					break;
+				}
+				else if (!act0[order[j] + 5])
+				{
+					act[0] = order[j] + 4;
+					break;
+				}
+			}
+			else
+			{
+				if (!act1[order[j] + 1])
+				{
+					act[1] = order[j];
+					break;
+				}
+				else if (!act1[order[j] + 5])
+				{
+					act[1] = order[j] + 4;
+					break;
+				}
+			}
+		}
+	}
+#ifdef DEBUG
+	cout << "act0: ";
+	for (int i = 0; i < 9; i++)
+	{
+		cout << i - 1 << ":" << act0[i] << ' ';
+	}
+	cout << endl;
+	cout << "act1: ";
+	for (int i = 0; i < 9; i++)
+	{
+		cout << i - 1 << ":" << act1[i] << ' ';
+	}
+	cout << endl;
+#endif // DEBUG
+	actions.x = act[0], actions.y = act[1];
+	actions.cost = 0;
+	return actions;
 }
 
 void init()
@@ -446,7 +635,7 @@ int main()
 #ifdef _BOTZONE_ONLINE
 	reader.parse(cin, all);
 #else
-	string s = string("{\"requests\":[{\"brickfield\":[4223528,37967378,10645520],\"forestfield\":[129206656,18612716,822863],\"mySide\":1,\"steelfield\":[0,2140160,0],\"waterfield\":[1024,8388608,65568]}],\"responses\":[]}");
+	string s = string("{\"requests\":[{\"brickfield\":[4751144,4412944,11006096],\"forestfield\":[126058496,3932640,3599],\"mySide\":1,\"steelfield\":[0,43008,0],\"waterfield\":[0,8388616,0]},{\"action\":[6,2],\"destroyed_blocks\":[2,1,6,7],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,0,-2,-2]},{\"action\":[2,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,-2,-2]},{\"action\":[-1,-2],\"destroyed_blocks\":[7,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,1,-2,-2]},{\"action\":[2,-2],\"destroyed_blocks\":[3,4],\"destroyed_tanks\":[],\"final_enemy_positions\":[2,2,-2,-2]},{\"action\":[1,-2],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[3,2,7,4]},{\"action\":[-1,2],\"destroyed_blocks\":[],\"destroyed_tanks\":[3,2],\"final_enemy_positions\":[-1,-1,7,5]},{\"action\":[-1,-1],\"destroyed_blocks\":[],\"destroyed_tanks\":[],\"final_enemy_positions\":[-1,-1,7,5]}],\"responses\":[[4,0,[\"tank\",0,0,15.3,10000,1,17.5,15.3,2,10000000,15.3,3,18.4,15.3,\"tank\",1,0,16.4,10000,1,19.5,16.4,2,10000000,16.4,3,16.4,16.4]],[0,0,[\"tank\",0,0,15.3,10000,1,17.5,15.3,2,10000000,15.3,3,20.4,15.3,\"tank\",1,0,14.3,10000,1,16.3,14.3,2,16.3,14.3,3,14.3,14.3]],[0,0,[\"tank\",0,0,14.3,10000,1,15.4,14.3,2,17.4,14.3,3,16.3,14.3,\"tank\",1,0,13.3,10000,1,15.3,13.3,2,15.3,13.3,3,13.3,13.3]],[0,1,[\"tank\",0,0,13.3,10000,1,13.3,13.3,2,16.4,13.3,3,17.3,13.3,\"tank\",1,0,10000000,10000,1,16.3,10000,2,14.3,16.3,3,12.3,14.3]],[1,4,[\"tank\",0,0,10000000,10000,1,11.2,10000,2,14.3,11.2,3,10000000,11.2,\"tank\",1,0,10000000,10000,1,17.3,10000,2,15.3,17.3,3,13.3,15.3]],[0,0,[\"tank\",0,0,10.2,10000,1,13.3,10.2,2,15.3,10.2,3,17.3,10.2,\"tank\",1,0,10000000,10000,1,17.3,10000,2,15.3,17.3,3,13.3,15.3]],[4,4,[\"tank\",0,0,9.2,10000,1,12.2,9.2,2,14.3,9.2,3,10000000,9.2,\"tank\",1,0,10000000,10000,1,10000000,10000,2,14.3,10000,3,10000000,14.3]],[-1,2,[\"tank\",0,0,9.2,10000,1,13.2,9.2,2,16.3,9.2,3,10000000,9.2,\"tank\",1,0,10000000,10000,1,10000000,10000,2,14.3,1000") + string("0,3,10000000,14.3]]]}");
 
 	reader.parse(s, all);
 #endif
@@ -527,7 +716,6 @@ int main()
 				}
 				seed += enemy_tank[j].x, seed ^= enemy_tank[j].x;
 				seed += enemy_tank[j].y, seed ^= enemy_tank[j].y;
-				cout << input[i]["final_enemy_positions"][2 * j + 1].asInt() << ' ' << input[i]["final_enemy_positions"][2 * j].asInt() << endl;
 				//enemy_position[j] = input[i]["final_enemy_positions"][j].asInt(), seed += enemy_position[j], seed ^= enemy_position[j];
 			}
 				
@@ -550,7 +738,7 @@ int main()
 		}
 	} 
 
-	cout << "enemy " << enemy_tank[0].y << ' ' << enemy_tank[0].x << endl << enemy_tank[1].y << ' ' << enemy_tank[1].x << endl;
+	//cout << "enemy " << enemy_tank[0].y << ' ' << enemy_tank[0].x << endl << enemy_tank[1].y << ' ' << enemy_tank[1].x << endl;
 
 	input = all["responses"];
 	for (int i = 0; i < input.size(); i++)//update self state
@@ -564,7 +752,6 @@ int main()
 			if (x == -1 || x >= 4)continue;
 			self_tank[j].x += px[x];
 			self_tank[j].y += py[x];
-			cout << "tank" << j << ": " << self_tank[j].y << ' ' << self_tank[j].x << endl;
 		}
 	}
 
@@ -593,8 +780,9 @@ int main()
 	output = Json::Value(Json::arrayValue);
 	debug = Json::Value(Json::arrayValue);
 	//srand(self_tank[0].x ^ self_tank[1].x ^ enemy_tank[0].y ^ enemy_tank[1].y ^ seed ^ 565646411);
-	move_generator();
-	int action;
+	
+	point actions;
+	actions = move_generator();
 	for (int i = 0; i < 2; i++)
 	{
 		debug.append("tank"), debug.append(i);
@@ -613,7 +801,7 @@ int main()
 			}
 		}
 		//cout << "d: " << direction << endl;
-		int xx = self_tank[i].x + px[direction];
+	/*	int xx = self_tank[i].x + px[direction];
 		int yy = self_tank[i].y + py[direction];
 		if (state[yy][xx] & brick)
 		{
@@ -622,12 +810,14 @@ int main()
 		}
 		else action = direction;
 		if (!valid(i, action)) action = -1;
-		output.append(action);
+		output.append(action);*/
 	}
-	//output.append(debug);
+	
+	
+	output.append(actions.x), output.append(actions.y);output.append(debug);
 	Json::FastWriter writer;
 	cout << writer.write(output);
-	cout << writer.write(debug);
+//	cout << writer.write(debug);
 //	cout << "wrong?" << endl;
 	return 0;
 }
