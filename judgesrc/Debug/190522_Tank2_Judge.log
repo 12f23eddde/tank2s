@@ -1,0 +1,219 @@
+﻿  jsoncpp.cpp
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(216): error C2084: 函数“Json::Features::Features(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(215): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(219): error C2084: 函数“Json::Features Json::Features::all(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(219): note: 参见“all”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(219): error C2264: “Json::Features::Features”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(221): error C2084: 函数“Json::Features Json::Features::strictMode(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(221): note: 参见“strictMode”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(222): error C2264: “Json::Features::Features”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(237): error C2084: 函数“bool Json::in(Json::Reader::Char,Json::Reader::Char,Json::Reader::Char,Json::Reader::Char,Json::Reader::Char)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(233): note: 参见“in”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(246): error C2084: 函数“bool Json::in(Json::Reader::Char,Json::Reader::Char,Json::Reader::Char,Json::Reader::Char,Json::Reader::Char,Json::Reader::Char)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(241): note: 参见“in”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(250): error C2084: 函数“bool Json::containsNewLine(Json::Reader::Location,Json::Reader::Location)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(250): note: 参见“containsNewLine”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(261): error C2084: 函数“Json::Reader::Reader(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(260): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(262): error C2065: “all”: 未声明的标识符
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(266): error C2084: 函数“Json::Reader::Reader(const Json::Features &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(265): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(271): error C2084: 函数“bool Json::Reader::parse(const std::string &,Json::Value &,bool)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(271): note: 参见“parse”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(278): error C2084: 函数“bool Json::Reader::parse(std::istream &,Json::Value &,bool)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(278): note: 参见“parse”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(288): error C2264: “Json::Reader::parse”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(294): error C2084: 函数“bool Json::Reader::parse(const char *,const char *,Json::Value &,bool)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(291): note: 参见“parse”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(332): error C2084: 函数“bool Json::Reader::readValue(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(332): note: 参见“readValue”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(405): error C2084: 函数“void Json::Reader::skipCommentTokens(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(405): note: 参见“skipCommentTokens”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(415): error C2084: 函数“bool Json::Reader::expectToken(Json::Reader::TokenType,Json::Reader::Token &,const char *)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(415): note: 参见“expectToken”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(422): error C2084: 函数“bool Json::Reader::readToken(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(422): note: 参见“readToken”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(493): error C2084: 函数“void Json::Reader::skipSpaces(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(493): note: 参见“skipSpaces”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(503): error C2084: 函数“bool Json::Reader::match(Json::Reader::Location,int)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(503): note: 参见“match”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(514): error C2084: 函数“bool Json::Reader::readComment(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(514): note: 参见“readComment”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(527): error C2065: “containsNewLine”: 未声明的标识符
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(527): warning C4551: 缺少参数列表的函数调用
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(528): error C2065: “containsNewLine”: 未声明的标识符
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(528): warning C4551: 缺少参数列表的函数调用
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(538): error C2084: 函数“void Json::Reader::addComment(Json::Reader::Location,Json::Reader::Location,Json::CommentPlacement)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(538): note: 参见“addComment”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(548): error C2084: 函数“bool Json::Reader::readCStyleComment(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(548): note: 参见“readCStyleComment”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(557): error C2084: 函数“bool Json::Reader::readCppStyleComment(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(557): note: 参见“readCppStyleComment”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(566): error C2084: 函数“void Json::Reader::readNumber(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(566): note: 参见“readNumber”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(569): error C2264: “Json::in”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(575): error C2084: 函数“bool Json::Reader::readString(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(575): note: 参见“readString”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(587): error C2084: 函数“bool Json::Reader::readObject(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(587): note: 参见“readObject”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(642): error C2084: 函数“bool Json::Reader::readArray(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(642): note: 参见“readArray”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(679): error C2084: 函数“bool Json::Reader::decodeNumber(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(679): note: 参见“decodeNumber”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(689): error C2084: 函数“bool Json::Reader::decodeNumber(Json::Reader::Token &,Json::Value &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(689): note: 参见“decodeNumber”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(692): error C2264: “Json::in”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(737): error C2084: 函数“bool Json::Reader::decodeDouble(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(737): note: 参见“decodeDouble”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(747): error C2084: 函数“bool Json::Reader::decodeDouble(Json::Reader::Token &,Json::Value &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(747): note: 参见“decodeDouble”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(783): error C2084: 函数“bool Json::Reader::decodeString(Json::Reader::Token &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(783): note: 参见“decodeString”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(793): error C2084: 函数“bool Json::Reader::decodeString(Json::Reader::Token &,std::string &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(793): note: 参见“decodeString”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(849): error C2084: 函数“bool Json::Reader::decodeUnicodeCodePoint(Json::Reader::Token &,Json::Reader::Location &,Json::Reader::Location,unsigned int &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(846): note: 参见“decodeUnicodeCodePoint”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(878): error C2084: 函数“bool Json::Reader::decodeUnicodeEscapeSequence(Json::Reader::Token &,Json::Reader::Location &,Json::Reader::Location,unsigned int &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(875): note: 参见“decodeUnicodeEscapeSequence”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(904): error C2084: 函数“bool Json::Reader::addError(const std::string &,Json::Reader::Token &,Json::Reader::Location)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(904): note: 参见“addError”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(913): error C2084: 函数“bool Json::Reader::recoverFromError(Json::Reader::TokenType)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(913): note: 参见“recoverFromError”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(928): error C2084: 函数“bool Json::Reader::addErrorAndRecover(const std::string &,Json::Reader::Token &,Json::Reader::TokenType)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(926): note: 参见“addErrorAndRecover”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(933): error C2084: 函数“Json::Value &Json::Reader::currentValue(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(933): note: 参见“currentValue”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(935): error C2084: 函数“Json::Reader::Char Json::Reader::getNextChar(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(935): note: 参见“getNextChar”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(943): error C2084: 函数“void Json::Reader::getLocationLineAndColumn(Json::Reader::Location,int &,int &) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(941): note: 参见“getLocationLineAndColumn”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(964): error C2084: 函数“std::string Json::Reader::getLocationLineAndColumn(Json::Reader::Location) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(964): note: 参见“getLocationLineAndColumn”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(966): error C2264: “Json::Reader::getLocationLineAndColumn”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(981): error C2084: 函数“std::string Json::Reader::getFormatedErrorMessages(void) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(981): note: 参见“getFormatedErrorMessages”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(985): error C2084: 函数“std::string Json::Reader::getFormattedErrorMessages(void) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(985): note: 参见“getFormattedErrorMessages”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(992): error C2264: “Json::Reader::getLocationLineAndColumn”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(996): error C2264: “Json::Reader::getLocationLineAndColumn”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1001): error C2084: 函数“std::vector<Json::Reader::StructuredError,std::allocator<_Ty>> Json::Reader::getStructuredErrors(void) const”已有主体
+          with
+          [
+              _Ty=Json::Reader::StructuredError
+          ]
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1001): note: 参见“getStructuredErrors”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1016): error C2084: 函数“std::istream &Json::operator >>(std::istream &,Json::Value &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1016): note: 参见“>>”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1017): error C2264: “Json::Reader::Reader”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1018): error C2264: “Json::Reader::parse”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1021): warning C4473: “fprintf”: 没有为格式字符串传递足够的参数
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1021): note: 占位符和其参数预计 1 可变参数，但提供的却是 0 参数
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1021): note: 缺失的可变参数 1 为格式字符串“%s”所需
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1198): error C2084: 函数“Json::ValueIteratorBase::ValueIteratorBase(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1196): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1209): error C2084: 函数“Json::ValueIteratorBase::ValueIteratorBase(const std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const _Kty,_Ty>>>> &)”已有主体
+          with
+          [
+              _Kty=Json::Value::CZString,
+              _Ty=Json::Value
+          ]
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1207): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1224): error C2084: 函数“Json::Value &Json::ValueIteratorBase::deref(void) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1224): note: 参见“deref”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1234): error C2084: 函数“void Json::ValueIteratorBase::increment(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1234): note: 参见“increment”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1244): error C2084: 函数“void Json::ValueIteratorBase::decrement(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1244): note: 参见“decrement”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1255): error C2084: 函数“Json::ValueIteratorBase::difference_type Json::ValueIteratorBase::computeDistance(const Json::ValueIteratorBase::SelfType &) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1255): note: 参见“computeDistance”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1289): error C2084: 函数“bool Json::ValueIteratorBase::isEqual(const Json::ValueIteratorBase::SelfType &) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1289): note: 参见“isEqual”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1302): error C2084: 函数“void Json::ValueIteratorBase::copy(const Json::ValueIteratorBase::SelfType &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1302): note: 参见“copy”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1313): error C2084: 函数“Json::Value Json::ValueIteratorBase::key(void) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1313): note: 参见“key”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1333): error C2084: 函数“Json::UInt Json::ValueIteratorBase::index(void) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1333): note: 参见“index”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1346): error C2084: 函数“const char *Json::ValueIteratorBase::memberName(void) const”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1346): note: 参见“memberName”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1365): error C2084: 函数“Json::ValueConstIterator::ValueConstIterator(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1365): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1365): error C2264: “Json::ValueIteratorBase::ValueIteratorBase”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1370): error C2084: 函数“Json::ValueConstIterator::ValueConstIterator(const std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const _Kty,_Ty>>>> &)”已有主体
+          with
+          [
+              _Kty=Json::Value::CZString,
+              _Ty=Json::Value
+          ]
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1368): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1370): error C2264: “Json::ValueIteratorBase::ValueIteratorBase”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1382): error C2084: 函数“Json::ValueConstIterator::SelfType &Json::ValueConstIterator::operator =(const Json::ValueIteratorBase &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1382): note: 参见“=”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1395): error C2084: 函数“Json::ValueIterator::ValueIterator(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1395): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1395): error C2264: “Json::ValueIteratorBase::ValueIteratorBase”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1399): error C2084: 函数“Json::ValueIterator::ValueIterator(const std::_Tree_iterator<std::_Tree_val<std::_Tree_simple_types<std::pair<const _Kty,_Ty>>>> &)”已有主体
+          with
+          [
+              _Kty=Json::Value::CZString,
+              _Ty=Json::Value
+          ]
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1398): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1399): error C2264: “Json::ValueIteratorBase::ValueIteratorBase”: 函数定义或声明中有错误；未调用函数
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1409): error C2084: 函数“Json::ValueIterator::ValueIterator(const Json::ValueConstIterator &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1408): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1412): error C2084: 函数“Json::ValueIterator::ValueIterator(const Json::ValueIterator &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1411): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1414): error C2084: 函数“Json::ValueIterator::SelfType &Json::ValueIterator::operator =(const Json::ValueIterator::SelfType &)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1414): note: 参见“=”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1469): error C2374: “Json::kNull”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1469): note: 参见“Json::kNull”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1470): error C2374: “Json::kNullRef”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1470): note: 参见“Json::kNullRef”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1471): error C2374: “null”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1471): note: 参见“null”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1473): error C2374: “minInt”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1473): note: 参见“minInt”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1474): error C2374: “maxInt”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1474): note: 参见“maxInt”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1475): error C2374: “maxUInt”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1475): note: 参见“maxUInt”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1477): error C2374: “minInt64”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1477): note: 参见“minInt64”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1478): error C2374: “maxInt64”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1478): note: 参见“maxInt64”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1479): error C2374: “maxUInt64”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1479): note: 参见“maxUInt64”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1483): error C2374: “Json::maxUInt64AsDouble”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1483): note: 参见“Json::maxUInt64AsDouble”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1485): error C2374: “minLargestInt”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1485): note: 参见“minLargestInt”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1486): error C2374: “maxLargestInt”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1486): note: 参见“maxLargestInt”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1487): error C2374: “maxLargestUInt”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1487): note: 参见“maxLargestUInt”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1490): error C2374: “Json::unknown”: 重定义；多次初始化
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1490): note: 参见“Json::unknown”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1496): error C2995: “bool Json::InRange(double,T,U)”: 函数模板已经定义
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1494): note: 参见“Json::InRange”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1520): error C2572: “Json::duplicateStringValue”: 重定义默认参数 : 参数 1
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1519): note: 参见“Json::duplicateStringValue”的声明
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1520): error C2084: 函数“char *Json::duplicateStringValue(const char *,unsigned int)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1519): note: 参见“duplicateStringValue”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1540): error C2084: 函数“void Json::releaseStringValue(char *)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1540): note: 参见“releaseStringValue”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1570): error C2084: 函数“Json::Value::CommentInfo::CommentInfo(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1570): note: 参见“{ctor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1572): error C2084: 函数“Json::Value::CommentInfo::~CommentInfo(void)”已有主体
+  D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1572): note: 参见“{dtor}”的前一个定义
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1574): error C2065: “releaseStringValue”: 未声明的标识符
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\jsoncpp.cpp(1574): fatal error C1003: 错误计数超过 100；正在停止编译
+  Tank2SJudge.cpp
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\bot.h(335): warning C4018: “<”: 有符号/无符号不匹配
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\bot.h(375): warning C4018: “<”: 有符号/无符号不匹配
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\Tank2SJudge.cpp(1022): warning C4018: “<”: 有符号/无符号不匹配
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\Tank2SJudge.cpp(1066): warning C4018: “<”: 有符号/无符号不匹配
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\Tank2SJudge.cpp(1078): warning C4018: “<”: 有符号/无符号不匹配
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\Tank2SJudge.cpp(1141): warning C4244: “=”: 从“time_t”转换到“unsigned int”，可能丢失数据
+D:\OneDrive - pku.edu.cn\Programs\190522_Tank2_Judge\Tank2SJudge.cpp(1421): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
+  正在生成代码...
