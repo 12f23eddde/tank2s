@@ -1,5 +1,5 @@
-//CUI°æJudge
-//×¢ÊÍÏÂĞĞ¿ÉÒÔÏÔÊ¾Ã¿ÂÖÇé¿ö
+//CUIç‰ˆJudge
+//æ³¨é‡Šä¸‹è¡Œå¯ä»¥æ˜¾ç¤ºæ¯è½®æƒ…å†µ
 //#define _SIMPLEOUTPUT_
 #include <stack>
 #include <set>
@@ -25,7 +25,7 @@ namespace TankGame
 	using std::istream;
 
 #ifdef _MSC_VER
-#pragma region ³£Á¿¶¨ÒåºÍËµÃ÷
+#pragma region å¸¸é‡å®šä¹‰å’Œè¯´æ˜
 #endif
 
 	enum GameResult
@@ -67,17 +67,17 @@ namespace TankGame
 		UpShoot, RightShoot, DownShoot, LeftShoot
 	};
 
-	// ×ø±ê×óÉÏ½ÇÎªÔ­µã£¨0, 0£©£¬x ÖáÏòÓÒÑÓÉì£¬y ÖáÏòÏÂÑÓÉì
-	// Side£¨¶ÔÕ½Ë«·½£© - 0 ÎªÀ¶£¬1 Îªºì
-	// Tank£¨Ã¿·½µÄÌ¹¿Ë£© - 0 Îª 0 ºÅÌ¹¿Ë£¬1 Îª 1 ºÅÌ¹¿Ë
-	// Turn£¨»ØºÏ±àºÅ£© - ´Ó 1 ¿ªÊ¼
+	// åæ ‡å·¦ä¸Šè§’ä¸ºåŸç‚¹ï¼ˆ0, 0ï¼‰ï¼Œx è½´å‘å³å»¶ä¼¸ï¼Œy è½´å‘ä¸‹å»¶ä¼¸
+	// Sideï¼ˆå¯¹æˆ˜åŒæ–¹ï¼‰ - 0 ä¸ºè“ï¼Œ1 ä¸ºçº¢
+	// Tankï¼ˆæ¯æ–¹çš„å¦å…‹ï¼‰ - 0 ä¸º 0 å·å¦å…‹ï¼Œ1 ä¸º 1 å·å¦å…‹
+	// Turnï¼ˆå›åˆç¼–å·ï¼‰ - ä» 1 å¼€å§‹
 
 	const int fieldHeight = 9, fieldWidth = 9, sideCount = 2, tankPerSide = 2;
 
-	// »ùµØµÄºá×ø±ê
+	// åŸºåœ°çš„æ¨ªåæ ‡
 	const int baseX[sideCount] = { fieldWidth / 2, fieldWidth / 2 };
 
-	// »ùµØµÄ×İ×ø±ê
+	// åŸºåœ°çš„çºµåæ ‡
 	const int baseY[sideCount] = { 0, fieldHeight - 1 };
 
 	const int dx[4] = { 0, 1, 0, -1 }, dy[4] = { -1, 0, 1, 0 };
@@ -90,7 +90,7 @@ namespace TankGame
 #ifdef _MSC_VER
 #pragma endregion
 
-#pragma region ¹¤¾ßº¯ÊıºÍÀà
+#pragma region å·¥å…·å‡½æ•°å’Œç±»
 #endif
 
 	inline bool ActionIsMove(Action x)
@@ -119,11 +119,11 @@ namespace TankGame
 		while (item)cnt += 1, item = (FieldItem)(((int)item) & (((int)item) - 1));
 		return cnt;
 	}
-	// ÅĞ¶Ï item ÊÇ²»ÊÇµşÔÚÒ»ÆğµÄ¶à¸öÌ¹¿Ë
+	// åˆ¤æ–­ item æ˜¯ä¸æ˜¯å åœ¨ä¸€èµ·çš„å¤šä¸ªå¦å…‹
 	inline bool HasMultipleTank(FieldItem item) // changed in tank2s
 	{
 		int cnt = count(item);
-		cnt -= !!(item & Forest);//³ıÈ¥forest 
+		cnt -= !!(item & Forest);//é™¤å»forest 
 		return cnt == 2;
 		//      return !!(item & (item - 1));
 	}
@@ -137,7 +137,7 @@ namespace TankGame
 		return item == Blue0 || item == Red0 ? 0 : 1;
 	}
 
-	// »ñµÃ¶¯×÷µÄ·½Ïò
+	// è·å¾—åŠ¨ä½œçš„æ–¹å‘
 	inline int ExtractDirectionFromAction(Action x)
 	{
 		if (x >= Up)
@@ -145,12 +145,12 @@ namespace TankGame
 		return -1;
 	}
 
-	// Îï¼şÏûÊ§µÄ¼ÇÂ¼£¬ÓÃÓÚ»ØÍË
+	// ç‰©ä»¶æ¶ˆå¤±çš„è®°å½•ï¼Œç”¨äºå›é€€
 	struct DisappearLog
 	{
 		FieldItem item;
 
-		// µ¼ÖÂÆäÏûÊ§µÄ»ØºÏµÄ±àºÅ
+		// å¯¼è‡´å…¶æ¶ˆå¤±çš„å›åˆçš„ç¼–å·
 		int turn;
 
 		int x, y;
@@ -169,56 +169,56 @@ namespace TankGame
 #ifdef _MSC_VER
 #pragma endregion
 
-#pragma region TankField Ö÷ÒªÂß¼­Àà
+#pragma region TankField ä¸»è¦é€»è¾‘ç±»
 #endif
 
 	class TankField
 	{
 	public:
-		//!//!//!// ÒÔÏÂ±äÁ¿Éè¼ÆÎªÖ»¶Á£¬²»ÍÆ¼ö½øĞĞĞŞ¸Ä //!//!//!//
+		//!//!//!// ä»¥ä¸‹å˜é‡è®¾è®¡ä¸ºåªè¯»ï¼Œä¸æ¨èè¿›è¡Œä¿®æ”¹ //!//!//!//
 
-		// ÓÎÏ·³¡µØÉÏµÄÎï¼ş£¨Ò»¸ö¸ñ×ÓÉÏ¿ÉÄÜÓĞ¶à¸öÌ¹¿Ë£©
+		// æ¸¸æˆåœºåœ°ä¸Šçš„ç‰©ä»¶ï¼ˆä¸€ä¸ªæ ¼å­ä¸Šå¯èƒ½æœ‰å¤šä¸ªå¦å…‹ï¼‰
 		FieldItem gameField[fieldHeight][fieldWidth] = {};
 
-		// Ì¹¿ËÊÇ·ñ´æ»î
+		// å¦å…‹æ˜¯å¦å­˜æ´»
 		bool tankAlive[sideCount][tankPerSide] = { { true, true },{ true, true } };
 
-		// »ùµØÊÇ·ñ´æ»î
+		// åŸºåœ°æ˜¯å¦å­˜æ´»
 		bool baseAlive[sideCount] = { true, true };
 
-		// Ì¹¿Ëºá×ø±ê£¬-1±íÊ¾Ì¹¿ËÒÑÕ¨
+		// å¦å…‹æ¨ªåæ ‡ï¼Œ-1è¡¨ç¤ºå¦å…‹å·²ç‚¸
 		int tankX[sideCount][tankPerSide] = {
 			{ fieldWidth / 2 - 2, fieldWidth / 2 + 2 },{ fieldWidth / 2 + 2, fieldWidth / 2 - 2 }
 		};
 
-		// Ì¹¿Ë×İ×ø±ê£¬-1±íÊ¾Ì¹¿ËÒÑÕ¨
+		// å¦å…‹çºµåæ ‡ï¼Œ-1è¡¨ç¤ºå¦å…‹å·²ç‚¸
 		int tankY[sideCount][tankPerSide] = { { 0, 0 },{ fieldHeight - 1, fieldHeight - 1 } };
 
-		// µ±Ç°»ØºÏ±àºÅ
+		// å½“å‰å›åˆç¼–å·
 		int currentTurn = 1;
 
-		// ÎÒÊÇÄÄÒ»·½
+		// æˆ‘æ˜¯å“ªä¸€æ–¹
 		int mySide;
 
-		// ÓÃÓÚ»ØÍËµÄlog
+		// ç”¨äºå›é€€çš„log
 		stack<DisappearLog> logs;
 		set<DisappearLog> last_delete;
 
-		// ¹ıÍù¶¯×÷£¨previousActions[x] ±íÊ¾ËùÓĞÈËÔÚµÚ x »ØºÏµÄ¶¯×÷£¬µÚ 0 »ØºÏµÄ¶¯×÷Ã»ÓĞÒâÒå£©
+		// è¿‡å¾€åŠ¨ä½œï¼ˆpreviousActions[x] è¡¨ç¤ºæ‰€æœ‰äººåœ¨ç¬¬ x å›åˆçš„åŠ¨ä½œï¼Œç¬¬ 0 å›åˆçš„åŠ¨ä½œæ²¡æœ‰æ„ä¹‰ï¼‰
 		Action previousActions[101][sideCount][tankPerSide] = { { { Stay, Stay },{ Stay, Stay } } };
 
-		//!//!//!// ÒÔÉÏ±äÁ¿Éè¼ÆÎªÖ»¶Á£¬²»ÍÆ¼ö½øĞĞĞŞ¸Ä //!//!//!//
+		//!//!//!// ä»¥ä¸Šå˜é‡è®¾è®¡ä¸ºåªè¯»ï¼Œä¸æ¨èè¿›è¡Œä¿®æ”¹ //!//!//!//
 
-		// ±¾»ØºÏË«·½¼´½«Ö´ĞĞµÄ¶¯×÷£¬ĞèÒªÊÖ¶¯ÌîÈë
+		// æœ¬å›åˆåŒæ–¹å³å°†æ‰§è¡Œçš„åŠ¨ä½œï¼Œéœ€è¦æ‰‹åŠ¨å¡«å…¥
 		Action nextAction[sideCount][tankPerSide] = { { Invalid, Invalid },{ Invalid, Invalid } };
 
-		// ÅĞ¶ÏĞĞÎªÊÇ·ñºÏ·¨£¨³ö½ç»òÒÆ¶¯µ½·Ç¿Õ¸ñ×ÓËã×÷·Ç·¨£©
-		// Î´¿¼ÂÇÌ¹¿ËÊÇ·ñ´æ»î
+		// åˆ¤æ–­è¡Œä¸ºæ˜¯å¦åˆæ³•ï¼ˆå‡ºç•Œæˆ–ç§»åŠ¨åˆ°éç©ºæ ¼å­ç®—ä½œéæ³•ï¼‰
+		// æœªè€ƒè™‘å¦å…‹æ˜¯å¦å­˜æ´»
 		bool ActionIsValid(int side, int tank, Action act)
 		{
 			if (act == Invalid)
 				return false;
-			if (act > Left && previousActions[currentTurn - 1][side][tank] > Left) // Á¬ĞøÁ½»ØºÏÉä»÷
+			if (act > Left && previousActions[currentTurn - 1][side][tank] > Left) // è¿ç»­ä¸¤å›åˆå°„å‡»
 				return false;
 			if (act == Stay || act > Left)
 				return true;
@@ -237,8 +237,8 @@ namespace TankGame
 										   // water cannot be stepped on but forest can(changed in tank2s)
 		}
 
-		// ÅĞ¶Ï nextAction ÖĞµÄËùÓĞĞĞÎªÊÇ·ñ¶¼ºÏ·¨
-		// ºöÂÔµôÎ´´æ»îµÄÌ¹¿Ë
+		// åˆ¤æ–­ nextAction ä¸­çš„æ‰€æœ‰è¡Œä¸ºæ˜¯å¦éƒ½åˆæ³•
+		// å¿½ç•¥æ‰æœªå­˜æ´»çš„å¦å…‹
 		bool ActionIsValid()
 		{
 			for (int side = 0; side < sideCount; side++)
@@ -268,26 +268,26 @@ namespace TankGame
 		}
 	public:
 
-		// Ö´ĞĞ nextAction ÖĞÖ¸¶¨µÄĞĞÎª²¢½øÈëÏÂÒ»»ØºÏ£¬·µ»ØĞĞÎªÊÇ·ñºÏ·¨
+		// æ‰§è¡Œ nextAction ä¸­æŒ‡å®šçš„è¡Œä¸ºå¹¶è¿›å…¥ä¸‹ä¸€å›åˆï¼Œè¿”å›è¡Œä¸ºæ˜¯å¦åˆæ³•
 		bool DoAction()
 		{
 			if (!ActionIsValid())
 				return false;
 
-			// 1 ÒÆ¶¯
+			// 1 ç§»åŠ¨
 			for (int side = 0; side < sideCount; side++)
 				for (int tank = 0; tank < tankPerSide; tank++)
 				{
 					Action act = nextAction[side][tank];
 
-					// ±£´æ¶¯×÷
+					// ä¿å­˜åŠ¨ä½œ
 					previousActions[currentTurn][side][tank] = act;
 					if (tankAlive[side][tank] && ActionIsMove(act))
 					{
 						int &x = tankX[side][tank], &y = tankY[side][tank];
 						FieldItem &items = gameField[y][x];
 
-						// ¼ÇÂ¼ Log
+						// è®°å½• Log
 						DisappearLog log;
 						log.x = x;
 						log.y = y;
@@ -295,17 +295,17 @@ namespace TankGame
 						log.turn = currentTurn;
 						logs.push(log);
 
-						// ±ä¸ü×ø±ê
+						// å˜æ›´åæ ‡
 						x += dx[act];
 						y += dy[act];
 
-						// ¸ü»»±ê¼Ç£¨×¢Òâ¸ñ×Ó¿ÉÄÜÓĞ¶à¸öÌ¹¿Ë£©
+						// æ›´æ¢æ ‡è®°ï¼ˆæ³¨æ„æ ¼å­å¯èƒ½æœ‰å¤šä¸ªå¦å…‹ï¼‰
 						gameField[y][x] |= log.item;
 						items &= ~log.item;
 					}
 				}
 
-			// 2 Éä¡á»÷!
+			// 2 å°„â™‚å‡»!
 			set<DisappearLog> itemsToBeDestroyed;
 			for (int side = 0; side < sideCount; side++)
 				for (int tank = 0; tank < tankPerSide; tank++)
@@ -330,22 +330,22 @@ namespace TankGame
 							}
 							if (items != None && items != Water)
 							{
-								// ¶ÔÉäÅĞ¶Ï
+								// å¯¹å°„åˆ¤æ–­
 								if (items >= Blue0 &&
 									!hasMultipleTankWithMe && !HasMultipleTank(items))
 								{
-									// ×Ô¼ºÕâÀïºÍÉäµ½µÄÄ¿±ê¸ñ×Ó¶¼Ö»ÓĞÒ»¸öÌ¹¿Ë
+									// è‡ªå·±è¿™é‡Œå’Œå°„åˆ°çš„ç›®æ ‡æ ¼å­éƒ½åªæœ‰ä¸€ä¸ªå¦å…‹
 									Action theirAction = nextAction[GetTankSide(items)][GetTankID(items)];
 									if (ActionIsShoot(theirAction) &&
 										ActionDirectionIsOpposite(act, theirAction))
 									{
-										// ¶øÇÒÎÒ·½ºÍ¶Ô·½µÄÉä»÷·½ÏòÊÇ·´µÄ
-										// ÄÇÃ´¾ÍºöÊÓÕâ´ÎÉä»÷
+										// è€Œä¸”æˆ‘æ–¹å’Œå¯¹æ–¹çš„å°„å‡»æ–¹å‘æ˜¯åçš„
+										// é‚£ä¹ˆå°±å¿½è§†è¿™æ¬¡å°„å‡»
 										break;
 									}
 								}
 
-								// ±ê¼ÇÕâĞ©Îï¼şÒª±»´İ»ÙÁË£¨·ÀÖ¹ÖØ¸´´İ»Ù£©
+								// æ ‡è®°è¿™äº›ç‰©ä»¶è¦è¢«æ‘§æ¯äº†ï¼ˆé˜²æ­¢é‡å¤æ‘§æ¯ï¼‰
 								for (int mask = 1; mask <= Red1; mask <<= 1)
 									if (items & mask)
 									{
@@ -402,7 +402,7 @@ namespace TankGame
 			return true;
 		}
 
-		// »Øµ½ÉÏÒ»»ØºÏ
+		// å›åˆ°ä¸Šä¸€å›åˆ
 		bool Revert()
 		{
 			if (currentTurn == 1)
@@ -449,7 +449,7 @@ namespace TankGame
 			return true;
 		}
 
-		// ÓÎÏ·ÊÇ·ñ½áÊø£¿Ë­Ó®ÁË£¿
+		// æ¸¸æˆæ˜¯å¦ç»“æŸï¼Ÿè°èµ¢äº†ï¼Ÿ
 		GameResult GetGameResult()
 		{
 
@@ -477,7 +477,7 @@ namespace TankGame
 			return Blue;
 		}
 
-		/* Èı¸ö int ±íÊ¾³¡µØ 01 ¾ØÕó£¨Ã¿¸ö int ÓÃ 27 Î»±íÊ¾ 3 ĞĞ£©
+		/* ä¸‰ä¸ª int è¡¨ç¤ºåœºåœ° 01 çŸ©é˜µï¼ˆæ¯ä¸ª int ç”¨ 27 ä½è¡¨ç¤º 3 è¡Œï¼‰
 		initialize gameField[][]
 		brick>water>steel
 		*/
@@ -510,17 +510,17 @@ namespace TankGame
 			}
 		}
 
-		// ´òÓ¡³¡µØ
+		// æ‰“å°åœºåœ°
 		void DebugPrint()
 		{
-			const string side2String[] = { "À¶", "ºì" };
-			const string boolean2String[] = { "ÒÑÕ¨", "´æ»î" };
+			const string side2String[] = { "è“", "çº¢" };
+			const string boolean2String[] = { "å·²ç‚¸", "å­˜æ´»" };
 			const char* boldHR = "==============================";
 			const char* slimHR = "------------------------------";
 			cout << boldHR << endl
-				<< "Í¼Àı£º" << endl
-				<< ". - ¿Õ\t# - ×©\t% - ¸Ö\t* - »ùµØ\t@ - ¶à¸öÌ¹¿Ë" << endl
-				<< "b - À¶0\tB - À¶1\tr - ºì0\tR - ºì1\tW - Ë®\tF - ÁÖ" << endl //Tank2 feature
+				<< "å›¾ä¾‹ï¼š" << endl
+				<< ". - ç©º\t# - ç –\t% - é’¢\t* - åŸºåœ°\t@ - å¤šä¸ªå¦å…‹" << endl
+				<< "b - è“0\tB - è“1\tr - çº¢0\tR - çº¢1\tW - æ°´\tF - æ—" << endl //Tank2 feature
 				<< slimHR << endl;
 			for (int y = 0; y < fieldHeight; y++)
 			{
@@ -568,19 +568,19 @@ namespace TankGame
 			cout << slimHR << endl;
 			for (int side = 0; side < sideCount; side++)
 			{
-				cout << side2String[side] << "£º»ùµØ" << boolean2String[baseAlive[side]];
+				cout << side2String[side] << "ï¼šåŸºåœ°" << boolean2String[baseAlive[side]];
 				for (int tank = 0; tank < tankPerSide; tank++)
-					cout << ", Ì¹¿Ë" << tank << boolean2String[tankAlive[side][tank]];
+					cout << ", å¦å…‹" << tank << boolean2String[tankAlive[side][tank]];
 				cout << endl;
 			}
-			cout << "µ±Ç°»ØºÏ£º" << currentTurn << "£¬";
+			cout << "å½“å‰å›åˆï¼š" << currentTurn << "ï¼Œ";
 			GameResult result = GetGameResult();
 			if (result == -2)
-				cout << "ÓÎÏ·ÉĞÎ´½áÊø" << endl;
+				cout << "æ¸¸æˆå°šæœªç»“æŸ" << endl;
 			else if (result == -1)
-				cout << "ÓÎÏ·Æ½¾Ö" << endl;
+				cout << "æ¸¸æˆå¹³å±€" << endl;
 			else
-				cout << side2String[result] << "·½Ê¤Àû" << endl;
+				cout << side2String[result] << "æ–¹èƒœåˆ©" << endl;
 			cout << boldHR << endl;
 		}
 
@@ -621,10 +621,10 @@ namespace TankGame
 	TankField *field = nullptr;
 
 #ifdef _MSC_VER
-#pragma region ÓëÆ½Ì¨½»»¥²¿·Ö
+#pragma region ä¸å¹³å°äº¤äº’éƒ¨åˆ†
 #endif
 
-	// ÄÚ²¿º¯Êı
+	// å†…éƒ¨å‡½æ•°
 	namespace Internals
 	{
 		Json::Reader reader;
@@ -657,7 +657,7 @@ namespace TankGame
 			else
 			{
 				
-				// ÊÇµÚÒ»»ØºÏ£¬²ÃÅĞÔÚ½éÉÜ³¡µØ
+				// æ˜¯ç¬¬ä¸€å›åˆï¼Œè£åˆ¤åœ¨ä»‹ç»åœºåœ°
 				int hasBrick[3], hasWater[3], hasSteel[3], hasForest[3];
 				for (int i = 0; i < 3; i++) {//Tank2 feature(???????????????)
 					hasWater[i] = value["waterfield"][i].asInt();
@@ -670,7 +670,7 @@ namespace TankGame
 			}
 		}
 
-		// ÇëÊ¹ÓÃ SubmitAndExit »òÕß SubmitAndDontExit
+		// è¯·ä½¿ç”¨ SubmitAndExit æˆ–è€… SubmitAndDontExit
 		void _submitAction(Action tank0, Action tank1, string debug = "", string data = "", string globalData = "")
 		{
 			Json::Value output(Json::objectValue), response(Json::arrayValue);
@@ -691,8 +691,8 @@ namespace TankGame
 		}
 	}
 
-	// ´ÓÊäÈëÁ÷£¨ÀıÈç cin »òÕß fstream£©¶ÁÈ¡»ØºÏĞÅÏ¢£¬´æÈë TankField£¬²¢ÌáÈ¡ÉÏ»ØºÏ´æ´¢µÄ data ºÍ globaldata
-	// ±¾µØµ÷ÊÔµÄÊ±ºòÖ§³Ö¶àĞĞ£¬µ«ÊÇ×îºóÒ»ĞĞĞèÒªÒÔÃ»ÓĞËõ½øµÄÒ»¸ö"}"»ò"]"½áÎ²
+	// ä»è¾“å…¥æµï¼ˆä¾‹å¦‚ cin æˆ–è€… fstreamï¼‰è¯»å–å›åˆä¿¡æ¯ï¼Œå­˜å…¥ TankFieldï¼Œå¹¶æå–ä¸Šå›åˆå­˜å‚¨çš„ data å’Œ globaldata
+	// æœ¬åœ°è°ƒè¯•çš„æ—¶å€™æ”¯æŒå¤šè¡Œï¼Œä½†æ˜¯æœ€åä¸€è¡Œéœ€è¦ä»¥æ²¡æœ‰ç¼©è¿›çš„ä¸€ä¸ª"}"æˆ–"]"ç»“å°¾
 	void ReadInput(istream& in, string& outData, string& outGlobalData)
 	{
 		Json::Value input;
@@ -702,11 +702,11 @@ namespace TankGame
 			getline(in, inputString);
 		} while (inputString.empty());
 #ifndef _BOTZONE_ONLINE
-		// ²Â²âÊÇµ¥ĞĞ»¹ÊÇ¶àĞĞ
+		// çŒœæµ‹æ˜¯å•è¡Œè¿˜æ˜¯å¤šè¡Œ
 		char lastChar = inputString[inputString.size() - 1];
 		if (lastChar != '}' && lastChar != ']')
 		{
-			// µÚÒ»ĞĞ²»ÒÔ}»ò]½áÎ²£¬²Â²âÊÇ¶àĞĞ
+			// ç¬¬ä¸€è¡Œä¸ä»¥}æˆ–]ç»“å°¾ï¼ŒçŒœæµ‹æ˜¯å¤šè¡Œ
 			string newString;
 			do
 			{
@@ -737,15 +737,15 @@ namespace TankGame
 		//Internals::_processRequestOrResponse(input, true);
 	}
 
-	// Ìá½»¾ö²ß²¢ÍË³ö£¬ÏÂ»ØºÏÊ±»áÖØĞÂÔËĞĞ³ÌĞò
+	// æäº¤å†³ç­–å¹¶é€€å‡ºï¼Œä¸‹å›åˆæ—¶ä¼šé‡æ–°è¿è¡Œç¨‹åº
 	void SubmitAndExit(Action tank0, Action tank1, string debug = "", string data = "", string globalData = "")
 	{
 		Internals::_submitAction(tank0, tank1, debug, data, globalData);
 		exit(0);
 	}
 
-	// Ìá½»¾ö²ß£¬ÏÂ»ØºÏÊ±³ÌĞò¼ÌĞøÔËĞĞ£¨ĞèÒªÔÚ Botzone ÉÏÌá½» Bot Ê±Ñ¡Ôñ¡°ÔÊĞí³¤Ê±ÔËĞĞ¡±£©
-	// Èç¹ûÓÎÏ·½áÊø£¬³ÌĞò»á±»ÏµÍ³É±ËÀ
+	// æäº¤å†³ç­–ï¼Œä¸‹å›åˆæ—¶ç¨‹åºç»§ç»­è¿è¡Œï¼ˆéœ€è¦åœ¨ Botzone ä¸Šæäº¤ Bot æ—¶é€‰æ‹©â€œå…è®¸é•¿æ—¶è¿è¡Œâ€ï¼‰
+	// å¦‚æœæ¸¸æˆç»“æŸï¼Œç¨‹åºä¼šè¢«ç³»ç»Ÿæ€æ­»
 	void SubmitAndDontExit(Action tank0, Action tank1)
 	{
 		Internals::_submitAction(tank0, tank1);
@@ -1191,7 +1191,7 @@ namespace judge {
 		int size = input.size();
 		if (size == 0)//before 1st round
 		{
-			//cout << "¶Ô¾Ö³õÊ¼»¯\n";
+			//cout << "å¯¹å±€åˆå§‹åŒ–\n";
 			for (int side = 0; side < TankGame::sideCount; side++)
 			{
 				auto obj = Json::Value(Json::objectValue);
@@ -1289,7 +1289,7 @@ namespace judge {
 						{
 							TankGame::FieldItem items = TankGame::field->gameField[TankGame::field->tankY[j][k]][TankGame::field->tankX[j][k]];
 							if (items&TankGame::Forest)
-								output["content"][int2str[1 - j]]["action"][k] = (int)(TankGame::Unknown);//É­ÁÖÀï·¢Æğ¶¯×÷ÁíÒ»bot¶Ô¸Ãbot¶¯×÷²»¿É¼û 
+								output["content"][int2str[1 - j]]["action"][k] = (int)(TankGame::Unknown);//æ£®æ—é‡Œå‘èµ·åŠ¨ä½œå¦ä¸€botå¯¹è¯¥botåŠ¨ä½œä¸å¯è§ 
 						}
 					TankGame::field->DoAction();
 					for (int j = 0; j < TankGame::sideCount; j++)
@@ -1391,7 +1391,7 @@ namespace judge {
 //Platform simulation
 int main() {
 
-	string action_name[9] = { "Í£Ö¹","ÏòÉÏ","ÏòÓÒ","ÏòÏÂ","Ïò×ó","ÉÏÉä","ÓÒÉä" ,"ÏÂÉä" ,"×óÉä" };
+	string action_name[9] = { "åœæ­¢","å‘ä¸Š","å‘å³","å‘ä¸‹","å‘å·¦","ä¸Šå°„","å³å°„" ,"ä¸‹å°„" ,"å·¦å°„" };
 
 	Json::Value judgeinfo;
 	bool problem = false;
@@ -1420,10 +1420,10 @@ int main() {
 		while (resJudge["command"].asString() != "finish") {
 			srand(time(0) + clock());
 			Bot bot1(toBot0);
-			//°ÑbotµÄmain()¸ÄÃûÎªbot_main()£¬×°ÈëbotÃû³Æ¿Õ¼ä£¬Ìæ»»µôÉÏÊöÑùÀıÃû³Æ¿Õ¼ä£¬¾ÍÄÜÊµÏÖ±¾µØ²ÃÅĞ
-			//²ÃÅĞÎª±ê×¼Tank2S²ÃÅĞ£¬Ã¿ÂÖ¶¼ÏÈ¸´Ô­¾ÖÃæÔÙÅĞ¶ÏÊ¤¸º£¬ËùÒÔËæÂÖÊıÔö¼Ó²ÃÅĞÔ½À´Ô½Âı¡£
-			//Ö÷ÒªÊ±¼äÏûºÄÔÚcout£¬Èç¹ûÈ¥µô¾ÖÃæÊä³ö£¬Ğ§ÂÊÓ°Ïì²»´ó¡£
-			//µ«Õâ¸ö°æ±¾²»ÄÜÓÃÓÚÑµÁ·Éñ¾­ÍøÂç£¬ÒòÎª²ÃÅĞĞ§ÂÊÌ«µÍÁË¡£	
+			//æŠŠbotçš„main()æ”¹åä¸ºbot_main()ï¼Œè£…å…¥botåç§°ç©ºé—´ï¼Œæ›¿æ¢æ‰ä¸Šè¿°æ ·ä¾‹åç§°ç©ºé—´ï¼Œå°±èƒ½å®ç°æœ¬åœ°è£åˆ¤
+			//è£åˆ¤ä¸ºæ ‡å‡†Tank2Sè£åˆ¤ï¼Œæ¯è½®éƒ½å…ˆå¤åŸå±€é¢å†åˆ¤æ–­èƒœè´Ÿï¼Œæ‰€ä»¥éšè½®æ•°å¢åŠ è£åˆ¤è¶Šæ¥è¶Šæ…¢ã€‚
+			//ä¸»è¦æ—¶é—´æ¶ˆè€—åœ¨coutï¼Œå¦‚æœå»æ‰å±€é¢è¾“å‡ºï¼Œæ•ˆç‡å½±å“ä¸å¤§ã€‚
+			//ä½†è¿™ä¸ªç‰ˆæœ¬ä¸èƒ½ç”¨äºè®­ç»ƒç¥ç»ç½‘ç»œï¼Œå› ä¸ºè£åˆ¤æ•ˆç‡å¤ªä½äº†ã€‚	
 			outBot["0"]["response"] = bot1.bot_main();
 			outBot["1"]["response"] = bot2.bot_main(toBot1);
 			toJudge["log"].append(outJudge);
@@ -1435,7 +1435,7 @@ int main() {
 			cout << "\tBot1 tank2: " << action_name[outBot["1"]["response"][1].asInt() + 1];
 			cout << "\n";
 #endif
-			//È¡Ïû×¢ÊÍºó¿ÉÒÔÖğÂÖÊä³ö
+			//å–æ¶ˆæ³¨é‡Šåå¯ä»¥é€è½®è¾“å‡º
 			//system("pause");
 			resJudge = judge::judge_main(toJudge);
 			toBot0["requests"].append(resJudge["content"]["0"]);
@@ -1444,7 +1444,7 @@ int main() {
 			toBot1["responses"].append(outBot["1"]["response"]);
 		}
 		if (judge::Bot1 == 0&& judge::Bot2==0) {
-			cout << "ÖÕÅÌ³öÏÖÎÊÌâ£¬Çë¿ªÊ¼µ÷ÊÔ\n";
+			cout << "ç»ˆç›˜å‡ºç°é—®é¢˜ï¼Œè¯·å¼€å§‹è°ƒè¯•\n";
 			problem = true;
 			system("pause");
 		}
