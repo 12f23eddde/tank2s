@@ -9,7 +9,6 @@
 
 #include<vector>
 #include<queue>
-#include<map>
 #include <set>
 #include <string>
 #include <iostream>
@@ -17,7 +16,7 @@
 #include <cstring>
 #include "jsoncpp/json.h"
 
-namespace Judge {
+namespace judge {
 	using namespace std;
 	const int dx[4] = { 0,1,0,-1 };
 	const int dy[4] = { -1,0,1,0 };
@@ -25,7 +24,7 @@ namespace Judge {
 	const int blue = 0, red = 1, nowinner = 2, game_continue = 3;
 	inline bool CoordValid(int x, int y)
 	{
-		return x >= 0 && x < 9&& y >= 0 && y < 9;
+		return x >= 0 && x < 9 && y >= 0 && y < 9;
 	}
 
 	inline bool is_move(int action) { return action >= 0 && action <= 3; }
@@ -33,11 +32,12 @@ namespace Judge {
 	inline int opposite_shoot(int act) { return act > 5 ? act - 2 : act + 2; }
 
 	// 全局
-	int self, enemy;
+	int self = blue, enemy = red;
 	bool vague_death = false;
 
 	struct Pos {
 		int x, y;
+		bool operator==(const Pos & p)const { return x == p.x&&y == p.y; }
 	};
 
 	struct Action {
@@ -48,19 +48,27 @@ namespace Judge {
 	struct Tank {
 		int x, y;
 		int action = -1;
-		int steps_in_forest = 0;
+		bool alive = true;
 		inline void setpos(int _x, int _y) {
-			if (x == -2)steps_in_forest++;
-			else steps_in_forest = 0;
 			x = _x, y = _y;
 		}
+
 		inline void setact(int act) { action = act; }
-		inline void die() { x = -1; setact(-1); }
-		inline bool alive() const { return x != -1; }
+		inline void die(Battlefield & f) { 
+			action = -1;
+			alive = false;
+			if (in_forest(f)) {
+				x = -2, y = -2; 
+			}
+			else {
+				x = -1, y = -1;
+			}
+		}
+		inline bool alive() const { return alive; }
 		inline bool can_shoot()const {
 			return action < 4;
 		}
-		inline bool in_forest() { return x != -2; }
+		inline bool in_forest(Battlefield & f) { return f.gamefield[y][x]==forest; }
 		inline bool at(int _x, int _y)const { return x == _x && y == _y; }
 		int & operator[](int index) { if (index == 0)return x; else return y; }
 		void move(int act) {
@@ -81,7 +89,8 @@ namespace Judge {
 		static int stay;
 		Tank tank[2][2];
 		vector<Pos> destroyed_blocks;
-		vector<Pos> destroyed_tanks;
+		vector<Tank> destroyed_tanks;
+		vector<Tank> prev_tanks[2];
 		void init_tank() {
 			tank[blue][0].setpos(2, 0);
 			tank[blue][1].setpos(6, 0);
@@ -107,8 +116,6 @@ namespace Judge {
 			Json::Value requests = info["requests"], responses = info["responses"];
 			//assert(requests.size());
 			//load battlefield info
-			self = requests[0u]["mySide"].asInt();
-			enemy = 1 - self;
 			init_tank();
 			for (unsigned j = 0; j < 3; j++)
 			{
@@ -141,6 +148,49 @@ namespace Judge {
 			return x >= 0 && x <= 8 && y >= 0 && y <= 8 && (gamefield[y][x] == none || gamefield[y][x] == forest);
 		}
 
+		Json::Value get_response(int side) {
+			Json::Value result;
+			result.append(prev_tanks[side][0].action);
+			result.append(prev_tanks[side][1].action);
+			return result;
+		}
+
+
+		Json::Value get_request(int side) {
+			int enemy_act[2] = {
+				prev_tanks[1 - side][0].in_forest(*this) ? -2:tank[1 - side][0].action,
+				prev_tanks[1 - side][1].in_forest(*this) ? -2:tank[1 - side][1].action
+			};
+			Json::Value request;
+			request["action"].append(enemy_act[0]);
+			request["action"].append(enemy_act[1]);
+			for (auto & i:destroyed_blocks)
+			{
+				request["destroyed_blocks"].append(i.x);
+				request["destroyed_blocks"].append(i.y);
+			}
+			for (auto & i : destroyed_tanks)
+			{
+				request["destroyed_tanks"].append(i.x);
+				request["destroyed_tanks"].append(i.y);
+			}
+			for (size_t i = 0; i < 2; i++)
+			{
+				int enemypos[2] = { tank[1 - side][i].x ,tank[1 - side][i].y };
+				if (tank[1 - side][i].in_forest(*this)) {
+					request["destroyed_tanks"].append(-2);
+					request["destroyed_tanks"].append(-2);
+				}
+				else {
+					request["final_enemy_positions"].append(enemypos[0]);
+					request["final_enemy_positions"].append(enemypos[1]);
+				}
+
+			}
+
+		}
+
+
 		void debug_print() {
 
 		}
@@ -165,7 +215,7 @@ namespace Judge {
 					tank[enemy][id].move(actionlist[id + 2]);
 				}
 			}
-			vector<Pos> distroylist;
+			set<Pos> distroylist;
 			bool tank_die[2][2] = { false,false,false,false };
 			for (size_t id = 0; id < 2; id++)
 			{
@@ -179,7 +229,7 @@ namespace Judge {
 						if (xx < 0 || xx>8 || yy < 0 || yy>8 || gamefield[yy][xx] == steel)
 							break;
 						if (gamefield[yy][xx] == base || gamefield[yy][xx] == brick) {
-							distroylist.push_back(Pos{ xx, yy });
+							distroylist.insert(Pos{ xx, yy });
 							break;
 						}
 						for (size_t i = 0; i < 2; i++)
@@ -215,7 +265,7 @@ namespace Judge {
 						if (xx < 0 || xx>8 || yy < 0 || yy>8 || gamefield[yy][xx] == steel)
 							break;
 						if (gamefield[yy][xx] == base || gamefield[yy][xx] == brick) {
-							distroylist.push_back(Pos{ xx, yy });
+							distroylist.insert(Pos{ xx, yy });
 							break;
 						}
 						for (size_t i = 0; i < 2; i++)
@@ -239,19 +289,34 @@ namespace Judge {
 					}
 				}
 			}
+			destroyed_tanks.clear();
+			destroyed_blocks.clear();
 			// 结算射击结果
-			for (auto & i : distroylist)gamefield[i.y][i.x] = none;
+			for (auto & i : distroylist) {
+				gamefield[i.y][i.x] = none;
+				destroyed_blocks.push_back(i);
+			}
 			for (size_t side = 0; side < 2; side++)
 			{
 				for (size_t id = 0; id < 2; id++)
 				{
-					if (tank_die[side][id])tank[side][id].die();
+					if (tank_die[side][id]) {
+						destroyed_tanks.push_back(tank[side][id]);
+						prev_tanks[side][id].action = tank[side][id].action;
+						tank[side][id].die(*this);
+					}
 				}
 			}
 
 		}
 
 		int play(int * actionlist) {
+			for (size_t side = 0; side < 2; side++)
+			{
+				prev_tanks[side].clear();
+				prev_tanks[side].push_back(tank[side][0]);
+				prev_tanks[side].push_back(tank[side][1]);
+			}
 			bool lose[2] = { false,false };
 			for (size_t id = 0; id < 2; id++)
 			{
@@ -332,18 +397,23 @@ namespace Judge {
 		// 不支持botzone
 		// 如有需要，可改为vector<Battlefield>存储每回合信息
 		Battlefield field;
+		int round = 0;
+		Json::Value input;
 		Json::Value output;
+		int game_result = 0;
+		bool long_time[2] = { false,false };
+
 
 		// 局面数组 这些数组在initfield中被一一设置
 		// 每一位都被设置，故无需初始化
 		int fieldBinary[3];
-		int waterBinary[3];					
+		int waterBinary[3];
 		int steelBinary[3];
 		int	forestBinary[3];
 		// 标准局面生成器
 		// 这个辣鸡生成器用了很多全局变量
 		// 另外他的rand()很慢 可能成为性能瓶颈
-		
+
 		void InitializeField()
 		{
 			bool hasBrick[9][9] = {};
@@ -465,7 +535,7 @@ namespace Judge {
 		}
 		// 利用BFS保证连通的EnsureConnected
 		// 同样可能成为性能瓶颈	
-			
+
 		//BFS to ensure that there is only one connected component
 		//InitializeField already ensures that water&steel will not appear on base and tank
 		struct node { int x, y; node() {}node(int xx, int yy) { x = xx, y = yy; } };
@@ -495,10 +565,83 @@ namespace Judge {
 			}
 			return jishu2 == jishu;
 		}
-		
-		Judge() {
+
+		Judge(bool b_longtime = false, bool r_longtime = false) {
+			long_time[blue] = b_longtime;
+			long_time[red] = r_longtime;
 			InitializeField();
-			
+			Json::Value info, temp;
+			Json::Reader _curr_reader;
+			Json::FastWriter _curr_writer;
+			const string s = "{\"requests\":[{\"brickfield\":[0,0,0],\"mySide\":0,\"steelfield\":[0,0,0],\"waterfield\":[0,0,0]}],\"responses\":[]}";
+			_curr_reader.parse(s, info);
+			for (int i = 0; i < 3; i++)
+				temp[i] = fieldBinary[i];
+			info["requests"][0u]["brickfield"] = temp;
+			for (int i = 0; i < 3; i++)
+				temp[i] = waterBinary[i];
+			info["requests"][0u]["waterfield"] = temp;
+			for (int i = 0; i < 3; i++)
+				temp[i] = steelBinary[i];
+			info["requests"][0u]["steelfield"] = temp;
+			for (int i = 0; i < 3; i++)
+				temp[i] = forestBinary[i];
+			info["requests"][0u]["forestfield"] = temp;
+			field.init(info);
+			output = info;
+
+		}
+		Judge(Json::Value & info) {
+			field.init(info);
+			output = info;
+		}
+		Json::Value judge_main() {
+			if (round == 0) {
+				round++;
+				Json::Value temp;
+				output["request"][0u]["mySide"] = 0;
+				temp.append(output);
+				output["request"][0u]["mySide"] = 1;
+				temp.append(output);
+				output = temp;
+				return output;
+			}
+		}
+
+
+		Json::Value judge_main(Json::Value & bot_blue, Json::Value & red_bot) {
+			if (round == 0) {
+				round++;
+				Json::Value temp;
+				output["request"][0u]["mySide"] = 0;
+				temp.append(output);
+				output["request"][0u]["mySide"] = 1;
+				temp.append(output);
+				output = temp;
+				return output;
+			}
+			else {
+				int act[4] = {
+					bot_blue[0u].asInt(),bot_blue[1].asInt(),
+					red_bot[0u].asInt(),red_bot[1].asInt()
+				};
+				game_result = field.play(act);
+				if (long_time[blue]) {
+					output[0u] = field.get_request(blue);
+				}
+				else {
+					output[0u]["requests"].append(field.get_request(blue));
+					output[0u]["responses"].append(field.get_response(blue));
+				}
+				if (long_time[red]) {
+					output[1] = field.get_request(red);
+				}
+				else {
+					output[1]["requests"].append(field.get_response(red));
+					output[1]["responses"].append(field.get_response(red));
+				}
+				return output;
+			}
 		}
 	};
 }
@@ -507,6 +650,43 @@ namespace Judge {
 
 int main()
 {
+	int game_result;
+	// 外层控制对局数
+	for (size_t i = 0; i < 100; i++)
+	{
+		// 初始化
+		// Bot bot1;Bot bot2;
+		judge::Judge JJ(false, false);
+		Json::Value output = JJ.judge_main();
+		while(game_result == judge::game_continue) {
+			Json::Value toBlue = output[0u];
+			Json::Value toRed = output[1];
+			// toBlue 和 toRed就是发给红蓝双方的行动
+			// 用 outBlue 和 outRed来接收输出;
+			Json::Value outBlue; 
+			Json::Value outRed; 
 
+			
+			output = JJ.judge_main(outBlue,outRed);
+			game_result = JJ.game_result;
+			switch (game_result)
+			{
+			case judge::blue:
+				//蓝方胜利
+				break;
+			case judge::red:
+				//红方胜利
+				break;
+			case judge::nowinner:
+				//平局
+				break;
+			default:
+				//继续
+				break;
+			}
+		}
+	}
+
+	
 	return 0;
 }
