@@ -12,7 +12,7 @@
 #include "jsoncpp/json.h"
 #include<algorithm>
 
-namespace AlphaTankZero {
+namespace AlphaTankZero1 {
 	using namespace std;
 	const int dx[4] = { 0,1,0,-1 };
 	const int dy[4] = { -1,0,1,0 };
@@ -919,20 +919,20 @@ namespace AlphaTankZero {
 
 			for (size_t id = 0; id < 2; id++)
 			{
-				for (size_t i = 2; i < 4; i++)
-				{
-					if (pt->move_valid(self, id, i))act[id].push_back(i);
-				}
 				for (size_t i = 0; i < 2; i++)
 				{
 					if (pt->move_valid(self, id, i))act[id].push_back(i);
 				}
-				for (size_t i = 6; i < 8; i++)
+				for (size_t i = 2; i < 4; i++)
+				{
+					if (pt->move_valid(self, id, i))act[id].push_back(i);
+				}
+				for (size_t i = 4; i < 6; i++)
 				{
 					if (pt->shoot_valid(self, id, i))
 						act[id].push_back(i);
 				}
-				for (size_t i = 4; i < 6; i++)
+				for (size_t i = 6; i < 8; i++)
 				{
 					if (pt->shoot_valid(self, id, i))
 						act[id].push_back(i);
