@@ -18,13 +18,12 @@
 
 /**调试用控制变量**/
 #ifndef _BOTZONE_ONLINE
-
 #define nDEBUG
 #define nquick
 #define nPRINT_STATE
 #endif
 
-namespace BlueBot {
+namespace RedBot {
     using namespace std;
     bool manual_input = false;
     bool print_distance = false;
@@ -1502,11 +1501,6 @@ namespace BlueBot {
             _multitank_far_punishment = parameters[4];
             _cost_attack_weight = parameters[5];
 #endif
-#ifdef DEBUG
-            cout <<_opposite_can_fire_advantage << endl;
-            cout << _self_distance_weight << endl;
-            cout << _depth_weight << endl;
-#endif
         }
 
         int last_act[2];
@@ -1830,7 +1824,6 @@ namespace BlueBot {
                     if (pt->shoot_valid(self, id, i))act[id].emplace_back(i);
                 }
             }
-            //rand test;
 #ifdef BOT_DEBUG
             cout << "n fire rounds 0: " << pt->tank[self][0].n_fire_rounds << endl;
             cout << "[act0]: ";
@@ -1842,6 +1835,7 @@ namespace BlueBot {
                 cout << act[1][i] << ' ';
             cout << endl;
 #endif
+
             Action best;
             best = pt->self_search();
             output.append(best[0]);

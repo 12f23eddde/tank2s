@@ -1,13 +1,21 @@
+// Modified for GEATank2S
 // Tank2S 本地裁判程序
 // 根据Bot修改而来
 // 由于无需与平台交互，非常精简
 // 且裁判默认为长时运行
+#pragma GCC optimize(2)
+#define TRAINING_MODE
+namespace training{
+    const int ROUNDS = 11;
+    const int parameter_count = 6;
+    double _para[2][parameter_count];
+}
 
-#include"Bot.h"
-#include"Bot1.h"
-
-#define _CRT_SECURE_NO_WARNINGS 1
 #define _BOTZONE_ONLINE
+//#define DEBUG
+//#define SHOW_TIME
+//#define SHOW_WARNINGS
+const bool SHOW_JSON = true;
 
 #include<vector>
 #include<queue>
@@ -16,8 +24,11 @@
 #include <iostream>
 #include <ctime>
 #include <cstring>
+#include <chrono>
 #include "jsoncpp/json.h"
 
+#include"bot2.h"
+#include"bot1.h"
 namespace judge {
 	using namespace std;
 	const int dx[4] = { 0,1,0,-1 };
@@ -77,7 +88,6 @@ namespace judge {
 		int & operator[](int index) { if (index == 0)return x; else return y; }
 		void move(int act) {
 			action = act;
-			if (act >= 4)assert(0);
 			if (act == -1)return;
 			x += dx[act];
 			y += dy[act];
@@ -155,7 +165,6 @@ namespace judge {
 			return true;
 		}
 		int cnt_tank(int x, int y)const {
-			if (!tankOK(x, y))assert(0);
 			int result = 0;
 			for (size_t side = 0; side < 2; side++)
 			{
@@ -279,17 +288,44 @@ namespace judge {
 
 
 		void debug_print() {
-			for (size_t i = 0; i < 9; i++)
-			{
-				for (size_t j = 0; j < 9; j++)
-				{
-					
-
-					cout << endl;
-				}
-			}
-			cout << endl;
-		}
+            for (int y = 0; y < 9; y++) {
+                for (int x = 0; x < 9; x++) {
+                    switch (gamefield[y][x]) {
+                        case none:
+                            if (y == tank[0][0].y && x == tank[0][0].x) cout << 'b';
+                            else if (y == tank[0][1].y && x == tank[0][1].x) cout << 'B';
+                            else if (y == tank[1][1].y && x == tank[1][1].x) cout << 'R';
+                            else if (y == tank[1][0].y && x == tank[1][0].x) cout << 'r';
+                            else cout << '.';
+                            break;
+                        case brick:
+                            cout << '#';
+                            break;
+                        case steel:
+                            cout << '%';
+                            break;
+                        case forest:
+                            if (y == tank[0][0].y && x == tank[0][0].x) cout << 'b';
+                            else if (y == tank[0][1].y && x == tank[0][1].x) cout << 'B';
+                            else if (y == tank[1][1].y && x == tank[1][1].x) cout << 'R';
+                            else if (y == tank[1][0].y && x == tank[1][0].x) cout << 'r';
+                            else cout << 'F';
+                            break;
+                        case water:
+                            cout << 'W';
+                            break;
+                        case base:
+                            cout << '^';
+                            break;
+                        default: {
+                            cout << '!';
+                            break;
+                        }
+                    }
+                }
+                cout << endl;
+            }
+        }
 
 		// quick_play
 		// 不检查合法性
@@ -329,13 +365,13 @@ namespace judge {
 						if (xx < 0 || xx>8 || yy < 0 || yy>8 || gamefield[yy][xx] == steel)
 							break;
 						if (gamefield[yy][xx] == base || gamefield[yy][xx] == brick) {
-							/*
+#ifdef DEBUG
 							if (gamefield[yy][xx] == base) {
 								
 								if (side == blue && yy == 0)cout << "蓝方自杀\n";
 								if (side == red && yy == 8)cout << "红方自杀\n";
 							}
-							*/
+#endif
 							destroylist.insert(Pos{ xx, yy });
 							break;
 						}
@@ -382,7 +418,6 @@ namespace judge {
 					if (tank_die[side][id]) {
 						destroyed_tanks.push_back(tank[side][id]);					
 						tank[side][id].die();
-						//cout << "Tank[" << side << "][" << id << "] died!";
 					}
 				}
 			}
@@ -401,9 +436,10 @@ namespace judge {
 				if (!move_valid(blue, id, actionlist[id]))
 				{
 					lose[blue] = true;
-
+#ifdef SHOW_WARNINGS
 					cout << "DEBUG信息：蓝方行为不合法\n";
 					cout << "Tank id: " << id << "  Action: " << actionlist[id] << endl;
+#endif
 				}
 			}
 			for (size_t id = 0; id < 2; id++)
@@ -411,8 +447,10 @@ namespace judge {
 				if (!move_valid(red, id, actionlist[id + 2]))
 				{
 					lose[red] = true;
+#ifdef SHOW_WARNINGS
 					cout << "DEBUG信息：红方行为不合法\n";
 					cout << "Tank id: " << id << "  Action: " << actionlist[id + 2] << endl;
+#endif
 				}
 			}
 			if (lose[blue] && lose[red])return nowinner;
@@ -436,9 +474,11 @@ namespace judge {
 		// 验证移动是否合法
 		bool move_valid(int side, int id, int act)const
 		{
+#ifdef SHOW_WARNINGS
 			if (!tank[side][id].alive && act != -1) {
 				if(act<4)cout << "裁判警告：死亡的坦克试图移动" << endl;
 			}
+#endif
 			if (act == -1)return true;
 			if (act > 3)return true;
 			int xx = tank[side][id].x + dx[act];
@@ -460,11 +500,10 @@ namespace judge {
 			return true;
 		}
 	};
-	const int sideCount = 2, tankPerSide = 2;
-	const int baseX[sideCount] = { 4,4 };
-	const int baseY[sideCount] = { 0, 8 };
-	const int tankX[sideCount][tankPerSide] = { { 2, 6 },{ 6 , 2 } };
-	const int tankY[sideCount][tankPerSide] = { { 0, 0 },{ 8, 8} };
+	const int baseX[2] = { 4,4 };
+	const int baseY[2] = { 0, 8 };
+	const int tankX[2][2] = { { 2, 6 },{ 6 , 2 } };
+	const int tankY[2][2] = { { 0, 0 },{ 8, 8} };
 	const int Up = 0, Right = 0, Down = 0, Left = 0;
 	int dirEnumerateList[24][4] = {
 		{ Up, Right, Down, Left },	{ Up, Right, Left, Down },	{ Up, Down, Right, Left },
@@ -487,7 +526,7 @@ namespace judge {
 		Json::Value output;
 		int game_result = 0;
 		bool long_time[2] = { false,false };
-		int current_seed = 0;
+		int current_seed = time(NULL);
 
 		// 局面数组 这些数组在initfield中被一一设置
 	
@@ -584,9 +623,9 @@ namespace judge {
 					hasSteel[9 / 2][x] = false;
 					hasForest[9 / 2][x] = false;
 				}
-				for (int side = 0; side < sideCount; side++)
+				for (int side = 0; side < 2; side++)
 				{
-					for (int tank = 0; tank < tankPerSide; tank++)
+					for (int tank = 0; tank < 2; tank++)
 						hasForest[tankY[side][tank]][tankX[side][tank]] = hasSteel[tankY[side][tank]][tankX[side][tank]] = hasWater[tankY[side][tank]][tankX[side][tank]] = false;
 					hasForest[baseY[side]][baseX[side]] = hasSteel[baseY[side]][baseX[side]] = hasWater[baseY[side]][baseX[side]] = hasBrick[baseY[side]][baseX[side]] = false;
 				}
@@ -596,7 +635,7 @@ namespace judge {
 				hasWater[9 / 2][9 / 2] = false;
 				hasSteel[9 / 2][9 / 2] = true;
 
-				for (int tank = 0; tank < tankPerSide; tank++) {
+				for (int tank = 0; tank < 2; tank++) {
 					hasSteel[9 / 2][tankX[0][tank]] = true;
 					hasForest[9 / 2][tankX[0][tank]] = hasWater[9 / 2][tankX[0][tank]] = hasBrick[9 / 2][tankX[0][tank]] = false;
 					for (int y = 0; y < portionH; y++)
@@ -755,27 +794,31 @@ namespace judge {
 
 
 int main()
-{
+{   using namespace std;
+    auto t_start = chrono::steady_clock::now();
+    srand((unsigned)time(NULL));
 	const int blue = 0, red = 1;
-	using namespace std;
-
 	int blue_win = 0, red_win = 0, peace = 0;
-	
+#ifdef TRAINING_MODE
+    for(int i = 0; i < training::parameter_count;i++)
+        cin >> training::_para[0][i];
+    for(int i = 0; i < training::parameter_count;i++)
+        cin >> training::_para[1][i];
+#endif
 	// 外层控制对局数
 	Json::FastWriter writer;
-	for (size_t i = 0; i < 10000; i++)
+	for (size_t i = 0; i < training::ROUNDS; i++)
 	{
 		//if (i == 358)cout << "DEBUG";
+        int StayCounter[2] = {0};
 		int game_result = judge::game_continue;
 		// 初始化
 		// Bot bot1;Bot bot2;
-		int seed = time(0);
-		srand(seed);
 		judge::Judge JJ(true, true);
 		Json::Value output = JJ.judge_main();
 		int turn = 0;
 		clock_t time = clock();
-		AlphaTankZero::Bot bot1(true); AlphaTankZero1::Bot bot2(true);
+		BlueBot::Bot bot1(true,training::_para[0]); RedBot::Bot bot2(true,training::_para[1]);
 		while(game_result == judge::game_continue && turn<100) {
 
 			//if (turn == 35)	cout << " ";
@@ -784,69 +827,68 @@ int main()
 			// 用 outBlue 和 outRed来接收输出;
 			Json::Value toBlue = output[0u];
 			Json::Value toRed = output[1];
-
-			//cout << "轮次 "<<turn<<endl;
-			//cout << "蓝方\n";
-			//cout << writer.write(toBlue);
-			//cout << "红方\n";
-			//cout << writer.write(toRed);
+#ifdef DEBUG
+            cout << "-- TURNS " << turn << " --" << endl;
+            if(SHOW_JSON){
+                cout << "BLUE INPUT: ";
+                cout << writer.write(toBlue) << endl;
+                cout << "RED INPUT: ";
+                cout << writer.write(toRed) << endl;
+            }
+#endif
 			Json::Value outBlue = bot1.bot_main(toBlue);
 			Json::Value outRed = bot2.bot_main(toRed);
-
-		
-			if (!(bot1.round[turn] == JJ.field.gamefield))
-				system("pause");
-			if (!(bot2.round[turn] == JJ.field.gamefield))
-				system("pause");
-			for (size_t i = 0; i < 2; i++)
-			{
-				bot1.round[turn].valid_self_pos(i, JJ.field.tank[blue][i].x, JJ.field.tank[blue][i].y);
-				bot1.round[turn].valid_enemy_pos(i, JJ.field.tank[red][i].x, JJ.field.tank[red][i].y);
-				
-				bot2.round[turn].valid_self_pos(i, JJ.field.tank[red][i].x, JJ.field.tank[red][i].y);
-;				bot2.round[turn].valid_enemy_pos(i, JJ.field.tank[blue][i].x, JJ.field.tank[blue][i].y);
-			}
-			// 完全对称局 局面对称性检查开关
-			// if (!JJ.field.ValidSymetry())
-			//	cout << "局面不对称\n";
-
+#ifdef DEBUG
+            JJ.field.debug_print();
+            if(SHOW_JSON){
+                cout << "BLUE OUTPUT: ";
+                cout << writer.write(outBlue) << endl;
+                cout << "RED OUTPUT: ";
+                cout << writer.write(outRed) << endl;
+            }
+#endif
+            if(outBlue[0u].asInt() == -1 && outBlue[1u].asInt() == -1) StayCounter[0]++;//减少不必要对局
+            if(outRed[0u].asInt() == -1 && outRed[1u].asInt() == -1) StayCounter[1]++;
 			turn++;
 			output = JJ.judge_main(outBlue,outRed);
 			game_result = JJ.game_result;
+            if(turn >= 100) game_result = judge::nowinner;
+            if(StayCounter[0] >= 5 && StayCounter[1]>= 5){
+                StayCounter[0] = 0;
+                StayCounter[1] = 0;
+                game_result = judge::nowinner;
+            }
 			switch (game_result)
 			{
 			case judge::blue:
 				//蓝方胜利
 				blue_win++;
-				printf( "蓝方胜利\n");
+#ifdef DEBUG
+				printf( "Blue Wins\n");
+#endif
 				break;
 			case judge::red:
 				//红方胜利
 				red_win++;
-				printf("红方胜利\n");
 				break;
 			case judge::nowinner:
 				//平局
 				peace++;
-				printf( "平局\n");
 				break;
 			default:
-				//继续
-				
 				break;
 			}
 		}
-		if (turn >= 100&&game_result==judge::game_continue)peace++;
-		printf("顺利完成第%d局，共%d轮，耗时%dms\n", 
-			i + 1, turn, clock() - time);
+		#ifdef SHOW_TIME
+        if (game_result == judge::blue) cout << "[DEBUG] bot1-blue wins ";
+        else if (game_result == judge::red) cout << "[DEBUG] bot2-red wins ";
+        else if (game_result == judge::nowinner) cout << "[DEBUG] fair ";
+        cout << "with turns " << turn << endl;
+#endif
 	}
-	cout << "10000局完成，总耗时" << clock() << "ms\n";
-	printf("蓝方胜场：%d\t红方胜场：%d\t平局：%d\n", blue_win, red_win, peace);
-	printf("蓝方射击次数：%d\t移动次数：%d\t静止次数：%d\t坦克阵亡次数：%d\n",
-		AlphaTankZero::shoot_cnt, AlphaTankZero::move_cnt, AlphaTankZero::stay_cnt,judge::blue_tank_die);
-	printf("红方射击次数：%d\t移动次数：%d\t静止次数：%d\t坦克阵亡次数：%d\n",
-		AlphaTankZero1::shoot_cnt, AlphaTankZero1::move_cnt, AlphaTankZero1::stay_cnt,judge::red_tank_die);
-	system("pause");
-	
+#ifdef DEBUG
+	printf("Blue wins：%d\tRed wins：%d\tFair：%d\n", blue_win, red_win, peace);
+#endif
+	cout << blue_win*2+peace << ' ' << red_win*2+peace << endl;
 	return 0;
 }
